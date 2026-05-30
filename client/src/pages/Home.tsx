@@ -144,6 +144,7 @@ export default function Home() {
   // Ref for the first showcase video section
   const showcaseSectionRef = useRef<HTMLDivElement>(null);
   const showcaseVideoRef = useRef<HTMLVideoElement>(null);
+  const [isShowcaseMuted, setIsShowcaseMuted] = useState<boolean>(true);
   
   // Touch coordinates for swipe support
   const touchStartX = useRef<number | null>(null);
@@ -273,6 +274,8 @@ export default function Home() {
         const videoElement = showcaseVideoRef.current;
         if (videoElement) {
           if (entry.isIntersecting) {
+            // Keep the muted state in sync with React state
+            videoElement.muted = isShowcaseMuted;
             videoElement.play()
               .catch((err) => {
                 console.log("Showcase video autoplay failed:", err);
@@ -610,6 +613,14 @@ export default function Home() {
     setCurrentReelIndex((prev) => (prev + 1) % instagramReels.length);
   };
 
+  const toggleShowcaseMute = () => {
+    const videoElement = showcaseVideoRef.current;
+    if (videoElement) {
+      videoElement.muted = !isShowcaseMuted;
+      setIsShowcaseMuted(!isShowcaseMuted);
+    }
+  };
+
   const prevReel = () => {
     // Pause current playing video
     const currentVideo = document.getElementById(`instagram-reel-player-${currentReelIndex}`) as HTMLVideoElement;
@@ -783,17 +794,39 @@ export default function Home() {
               A quick demonstration of the seamless 360° rotation, tactile backlit typing, and instant protection.
             </p>
           </div>
-          <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl bg-black aspect-video">
+          <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl bg-black aspect-video group/video">
             <video 
               ref={showcaseVideoRef}
               src="/manus-storage/orig_video_52cb8baf.mp4" 
               controls 
-              muted
+              muted={isShowcaseMuted}
               loop
               playsInline
               className="w-full h-full object-cover"
               poster="/manus-storage/orig_hero_9ef6b916.webp"
             />
+            
+            {/* Floating Mute/Unmute Button */}
+            <button
+              onClick={toggleShowcaseMute}
+              className="absolute bottom-4 left-4 z-20 p-3 rounded-full bg-black/60 backdrop-blur-md border border-white/20 hover:bg-black/80 transition-all text-white shadow-lg cursor-pointer flex items-center gap-2 group/btn animate-bounce"
+              style={{ animationDuration: '3s' }}
+              aria-label={isShowcaseMuted ? "Unmute showcase video" : "Mute showcase video"}
+            >
+              <div className="relative">
+                {isShowcaseMuted ? (
+                  <>
+                    <VolumeX className="h-4 w-4" />
+                    <span className="absolute -inset-1 rounded-full bg-primary/30 animate-ping" />
+                  </>
+                ) : (
+                  <Volume2 className="h-4 w-4" />
+                )}
+              </div>
+              <span className="text-xs font-bold max-w-0 overflow-hidden group-hover/btn:max-w-[100px] transition-all duration-300 ease-out whitespace-nowrap">
+                {isShowcaseMuted ? "Enable Sound" : "Mute"}
+              </span>
+            </button>
           </div>
         </div>
       </section>
