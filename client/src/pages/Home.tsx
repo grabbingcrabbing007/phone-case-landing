@@ -42,7 +42,9 @@ import {
   Volume2,
   VolumeX,
   CreditCard,
-  Lock
+  Lock,
+  ArrowRight,
+  Info
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -1090,32 +1092,39 @@ export default function Home() {
       )}
 
       {/* ======================================================== */}
-      {/* MODALS / DIALOGS FOR FUNCTIONAL LINKS */}
+      {/* REDESIGNED SECURE CHECKOUT MODAL (Stripe-Like, Responsive) */}
       {/* ======================================================== */}
-
-      {/* Checkout Modal / Flow */}
       <Dialog open={activeModal === "checkout"} onOpenChange={(open) => !open && setActiveModal(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 rounded-2xl">
-          <div className="grid md:grid-cols-12">
+        <DialogContent className="max-w-4xl max-h-[92vh] md:max-h-[85vh] overflow-y-auto p-0 rounded-2xl border border-border bg-background shadow-2xl">
+          <div className="grid md:grid-cols-12 h-full">
             
-            {/* Left Column: Checkout Form */}
-            <div className="md:col-span-7 p-6 sm:p-8 space-y-6">
-              <div className="flex flex-col gap-1.5">
-                <DialogTitle className="font-display text-2xl font-bold tracking-tight">Checkout Details</DialogTitle>
-                <DialogDescription className="text-xs text-muted-foreground">Complete your shipping information to proceed to secure payment.</DialogDescription>
+            {/* Left Column: Form Details (7 cols) */}
+            <div className="md:col-span-7 p-6 sm:p-8 space-y-8">
+              
+              {/* Secure Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-border/40">
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400 font-bold tracking-wider uppercase">
+                    <Lock className="h-3.5 w-3.5 stroke-[2.5]" /> Secure Checkout
+                  </div>
+                  <DialogTitle className="font-display text-2xl font-extrabold tracking-tight">Maceo Order Form</DialogTitle>
+                </div>
               </div>
 
-              <form onSubmit={handleCheckoutSubmit} className="space-y-4">
+              <form onSubmit={handleCheckoutSubmit} className="space-y-6">
                 
-                {/* 1. Design & Model Selection */}
-                <div className="space-y-3">
-                  <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase">1. Customize Your Order</span>
-                  
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="checkout-color" className="text-xs">Color / Design</Label>
+                {/* Section 1: Product Setup */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">1</div>
+                    <h3 className="text-sm font-bold tracking-tight">Customize Your Device</h3>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="checkout-color" className="text-xs font-semibold text-muted-foreground">Select Color</Label>
                       <Select value={checkoutColor} onValueChange={setCheckoutColor}>
-                        <SelectTrigger id="checkout-color" className="rounded-xl bg-background border-border/80 text-xs h-11">
+                        <SelectTrigger id="checkout-color" className="rounded-xl bg-background border-border/80 text-xs h-12 focus:ring-primary">
                           <SelectValue placeholder="Select Color" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1128,10 +1137,10 @@ export default function Home() {
                       </Select>
                     </div>
 
-                    <div className="space-y-1.5">
-                      <Label htmlFor="checkout-model" className="text-xs">iPad Model Compatibility</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="checkout-model" className="text-xs font-semibold text-muted-foreground">iPad Model</Label>
                       <Select value={checkoutModel} onValueChange={setCheckoutModel}>
-                        <SelectTrigger id="checkout-model" className="rounded-xl bg-background border-border/80 text-xs h-11">
+                        <SelectTrigger id="checkout-model" className="rounded-xl bg-background border-border/80 text-xs h-12 focus:ring-primary">
                           <SelectValue placeholder="Select iPad Model" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1146,93 +1155,96 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* 2. Shipping Info */}
-                <div className="space-y-3 pt-2 border-t border-border/40">
-                  <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase">2. Shipping Address</span>
-                  
-                  <div className="space-y-3">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="shipping-name" className="text-xs">Full Name</Label>
+                {/* Section 2: Shipping details */}
+                <div className="space-y-4 pt-4 border-t border-border/40">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">2</div>
+                    <h3 className="text-sm font-bold tracking-tight">Shipping Information</h3>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="shipping-name" className="text-xs font-semibold text-muted-foreground">Full Name</Label>
                       <Input 
                         id="shipping-name" 
                         placeholder="John Doe" 
                         value={shippingName} 
                         onChange={(e) => setShippingName(e.target.value)}
-                        className="rounded-xl h-11 text-xs border-border/80"
+                        className="rounded-xl h-12 text-xs border-border/80 focus-visible:ring-primary"
                         required
                       />
                     </div>
 
-                    <div className="grid gap-3 sm:grid-cols-2">
-                      <div className="space-y-1.5">
-                        <Label htmlFor="shipping-email" className="text-xs">Email Address</Label>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="shipping-email" className="text-xs font-semibold text-muted-foreground">Email Address</Label>
                         <Input 
                           id="shipping-email" 
                           type="email" 
                           placeholder="john@example.com" 
                           value={shippingEmail} 
                           onChange={(e) => setShippingEmail(e.target.value)}
-                          className="rounded-xl h-11 text-xs border-border/80"
+                          className="rounded-xl h-12 text-xs border-border/80 focus-visible:ring-primary"
                           required
                         />
                       </div>
-                      <div className="space-y-1.5">
-                        <Label htmlFor="shipping-phone" className="text-xs">Phone Number</Label>
+                      <div className="space-y-2">
+                        <Label htmlFor="shipping-phone" className="text-xs font-semibold text-muted-foreground">Phone Number</Label>
                         <Input 
                           id="shipping-phone" 
                           type="tel" 
                           placeholder="+1 (555) 000-0000" 
                           value={shippingPhone} 
                           onChange={(e) => setShippingPhone(e.target.value)}
-                          className="rounded-xl h-11 text-xs border-border/80"
+                          className="rounded-xl h-12 text-xs border-border/80 focus-visible:ring-primary"
                           required
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-1.5">
-                      <Label htmlFor="shipping-address" className="text-xs">Street Address</Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="shipping-address" className="text-xs font-semibold text-muted-foreground">Street Address</Label>
                       <Input 
                         id="shipping-address" 
                         placeholder="123 Tech Avenue, Apt 4B" 
                         value={shippingAddress} 
                         onChange={(e) => setShippingAddress(e.target.value)}
-                        className="rounded-xl h-11 text-xs border-border/80"
+                        className="rounded-xl h-12 text-xs border-border/80 focus-visible:ring-primary"
                         required
                       />
                     </div>
 
-                    <div className="grid gap-3 grid-cols-3">
-                      <div className="space-y-1.5 col-span-1">
-                        <Label htmlFor="shipping-city" className="text-xs">City</Label>
+                    <div className="grid gap-4 grid-cols-3">
+                      <div className="space-y-2 col-span-1">
+                        <Label htmlFor="shipping-city" className="text-xs font-semibold text-muted-foreground">City</Label>
                         <Input 
                           id="shipping-city" 
                           placeholder="New York" 
                           value={shippingCity} 
                           onChange={(e) => setShippingCity(e.target.value)}
-                          className="rounded-xl h-11 text-xs border-border/80"
+                          className="rounded-xl h-12 text-xs border-border/80 focus-visible:ring-primary"
                           required
                         />
                       </div>
-                      <div className="space-y-1.5 col-span-1">
-                        <Label htmlFor="shipping-zip" className="text-xs">ZIP Code</Label>
+                      <div className="space-y-2 col-span-1">
+                        <Label htmlFor="shipping-zip" className="text-xs font-semibold text-muted-foreground">ZIP Code</Label>
                         <Input 
                           id="shipping-zip" 
                           placeholder="10001" 
                           value={shippingZip} 
                           onChange={(e) => setShippingAddressZip(e.target.value)}
-                          className="rounded-xl h-11 text-xs border-border/80"
+                          className="rounded-xl h-12 text-xs border-border/80 focus-visible:ring-primary"
                           required
                         />
                       </div>
-                      <div className="space-y-1.5 col-span-1">
-                        <Label htmlFor="shipping-country" className="text-xs">Country</Label>
+                      <div className="space-y-2 col-span-1">
+                        <Label htmlFor="shipping-country" className="text-xs font-semibold text-muted-foreground">Country</Label>
                         <Input 
                           id="shipping-country" 
                           placeholder="United States" 
                           value={shippingCountry} 
                           onChange={(e) => setShippingCountry(e.target.value)}
-                          className="rounded-xl h-11 text-xs border-border/80"
+                          className="rounded-xl h-12 text-xs border-border/80 focus-visible:ring-primary"
                           required
                         />
                       </div>
@@ -1241,22 +1253,28 @@ export default function Home() {
                 </div>
 
                 {/* Submit & Secure Payment Button */}
-                <div className="pt-4 space-y-3">
+                <div className="pt-6 space-y-4">
                   <Button 
                     type="submit" 
                     disabled={checkoutSubmitting} 
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold py-6 rounded-xl shadow-lg text-sm"
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold py-7 rounded-full shadow-xl shadow-primary/20 text-sm transition-all hover:scale-[1.01]"
                   >
-                    {checkoutSubmitting ? "Saving Details..." : "Proceed to Secure Payment"}
+                    {checkoutSubmitting ? (
+                      "Saving Details..."
+                    ) : (
+                      <span className="flex items-center justify-center gap-2">
+                        Proceed to Secure Payment <ArrowRight className="h-4 w-4" />
+                      </span>
+                    )}
                   </Button>
                   
-                  {/* Payment Badges Info */}
-                  <div className="flex flex-col items-center gap-1 text-center">
-                    <span className="text-[10px] text-muted-foreground flex items-center justify-center gap-1 font-semibold">
-                      <Lock className="h-3 w-3 text-green-500" /> SECURE 256-BIT SSL CHECKOUT
+                  {/* Trust Info */}
+                  <div className="p-4 rounded-xl bg-green-500/5 border border-green-500/10 text-center flex flex-col gap-1 items-center">
+                    <span className="text-[10px] text-green-700 dark:text-green-300 font-extrabold flex items-center gap-1.5">
+                      <ShieldCheck className="h-4 w-4" /> 100% SECURE 256-BIT SSL ENCRYPTED GATEWAY
                     </span>
-                    <p className="text-[9px] text-muted-foreground leading-normal max-w-[280px]">
-                      We support all major Credit Cards, Apple Pay, and Google Pay. Payments are processed securely via encrypted gateway.
+                    <p className="text-[9px] text-muted-foreground max-w-sm">
+                      We securely accept all credit/debit cards, Apple Pay, and Google Pay. Your details are processed safely and will never be shared.
                     </p>
                   </div>
                 </div>
@@ -1264,64 +1282,72 @@ export default function Home() {
               </form>
             </div>
 
-            {/* Right Column: Order Summary (Sticky/Visual Column) */}
+            {/* Right Column: Order Summary (5 cols) */}
             <div className="md:col-span-5 bg-muted/30 p-6 sm:p-8 border-t md:border-t-0 md:border-l border-border/40 flex flex-col justify-between">
               <div className="space-y-6">
-                <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase">Order Summary</span>
+                <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase block">Order Summary</span>
                 
-                {/* Product Preview card */}
-                <div className="flex items-center gap-4 p-3 bg-background rounded-xl border border-border/40">
-                  <div className="h-16 w-16 bg-muted/40 rounded-lg p-2 flex items-center justify-center shrink-0">
+                {/* Premium Product Summary Card */}
+                <div className="p-4 bg-background rounded-2xl border border-border/60 shadow-sm space-y-4">
+                  <div className="h-40 bg-muted/40 rounded-xl p-4 flex items-center justify-center">
                     <img 
                       src={checkoutProduct.image} 
                       alt={checkoutProduct.name} 
-                      className="max-h-full max-w-full object-contain"
+                      className="max-h-full max-w-full object-contain transition-all duration-300 hover:scale-105"
                     />
                   </div>
-                  <div className="flex flex-col gap-1 min-w-0">
-                    <span className="text-xs font-bold truncate leading-tight">{checkoutProduct.name}</span>
+                  <div className="space-y-2">
+                    <span className="text-xs font-extrabold leading-tight block text-foreground">{checkoutProduct.name}</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-primary font-extrabold">$138.00</span>
-                      <span className="text-[10px] text-muted-foreground line-through">$278.00</span>
+                      <span className="text-sm text-primary font-extrabold">$138.00</span>
+                      <span className="text-xs text-muted-foreground line-through">$278.00</span>
+                      <Badge className="bg-red-500 text-white text-[9px] px-1.5 py-0 font-bold border-none">
+                        50% OFF
+                      </Badge>
                     </div>
-                    <Badge className="w-fit bg-primary/10 text-primary border-none text-[9px] px-1.5 py-0 font-bold">
-                      {checkoutProduct.colorName}
-                    </Badge>
+                    <div className="flex gap-2 pt-1">
+                      <Badge className="bg-primary/10 text-primary border-none text-[10px] font-bold px-2 py-0.5">
+                        {checkoutProduct.colorName}
+                      </Badge>
+                      <Badge variant="outline" className="text-[10px] font-bold px-2 py-0.5 border-border/80">
+                        11" Case
+                      </Badge>
+                    </div>
                   </div>
                 </div>
 
                 {/* Price Breakdown */}
-                <div className="space-y-2 text-xs">
+                <div className="space-y-3 text-xs pt-4 border-t border-border/40">
                   <div className="flex justify-between text-muted-foreground">
                     <span>Subtotal</span>
-                    <span className="font-semibold">$138.00</span>
+                    <span className="font-semibold text-foreground">$138.00</span>
                   </div>
                   <div className="flex justify-between text-muted-foreground">
                     <span>Shipping</span>
-                    <span className="font-semibold text-green-500">FREE</span>
+                    <span className="font-bold text-green-500">FREE</span>
                   </div>
                   <div className="flex justify-between text-muted-foreground">
                     <span>Tax</span>
-                    <span className="font-semibold">$0.00</span>
+                    <span className="font-semibold text-foreground">$0.00</span>
                   </div>
-                  <div className="pt-2 border-t border-border/40 flex justify-between text-sm font-bold">
+                  <div className="pt-3 border-t border-border/40 flex justify-between text-sm font-bold">
                     <span>Total Amount</span>
-                    <span className="text-primary text-base font-extrabold">$138.00</span>
+                    <span className="text-primary text-lg font-extrabold">$138.00</span>
                   </div>
                 </div>
               </div>
 
-              {/* Guarantees list */}
-              <div className="mt-8 pt-6 border-t border-border/40 space-y-3">
-                <div className="flex items-start gap-2.5 text-[10px] text-muted-foreground leading-normal">
-                  <Truck className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+              {/* Secure guarantees list */}
+              <div className="mt-8 pt-6 border-t border-border/40 space-y-4">
+                <div className="flex items-start gap-3 text-[10px] text-muted-foreground leading-relaxed">
+                  <Truck className="h-5 w-5 text-primary shrink-0" />
                   <div>
-                    <span className="font-bold block text-foreground">Free Worldwide Shipping</span>
-                    Tracking details will be emailed immediately after shipping.
+                    <span className="font-bold block text-foreground">Free Global Shipping</span>
+                    Dispatched within 24 hours. Full tracking code sent via email.
                   </div>
                 </div>
-                <div className="flex items-start gap-2.5 text-[10px] text-muted-foreground leading-normal">
-                  <ShieldCheck className="h-4 w-4 text-purple-500 shrink-0 mt-0.5" />
+                <div className="flex items-start gap-3 text-[10px] text-muted-foreground leading-relaxed">
+                  <ShieldCheck className="h-5 w-5 text-purple-500 shrink-0" />
                   <div>
                     <span className="font-bold block text-foreground">30-Day Money-Back Guarantee</span>
                     If you are not 100% satisfied, returns are completely free.
