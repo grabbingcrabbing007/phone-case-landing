@@ -254,7 +254,7 @@ export default function Home() {
       price: "$139.00",
       originalPrice: "$278.00",
       badge: "-50% OFF",
-      image: "/manus-storage/orig_black_4b39a4c4.png",
+      image: "/manus-storage/orig_black_f6dd41bf.webp",
       colorName: "Stealth Black",
       colorClass: "bg-slate-900",
       features: [
@@ -472,7 +472,7 @@ export default function Home() {
             <div className="absolute -inset-4 bg-gradient-to-tr from-primary/20 to-purple-500/20 rounded-3xl blur-3xl opacity-30 -z-10" />
             <div className="relative rounded-2xl overflow-hidden border border-border/60 shadow-2xl bg-card">
               <img 
-                src="/manus-storage/orig_hero_93875fb3.png" 
+                src="/manus-storage/orig_hero_9ef6b916.webp" 
                 alt="Maceo Transparent 360 Degree Rotating iPad Keyboard Case Banner" 
                 className="w-full object-cover aspect-[16/9] sm:aspect-[4/3] lg:aspect-[16/10]"
               />
@@ -504,7 +504,7 @@ export default function Home() {
               src="/manus-storage/orig_video_52cb8baf.mp4" 
               controls 
               className="w-full h-full object-cover"
-              poster="/manus-storage/orig_hero_93875fb3.png"
+              poster="/manus-storage/orig_hero_9ef6b916.webp"
             />
           </div>
         </div>
