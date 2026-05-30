@@ -319,8 +319,38 @@ export default function Home() {
         botReason.push("0 browser plugins on desktop");
       }
 
+      let userIp = "Unknown";
+      
+      // Step 1: Explicitly fetch the IP address first using fast and reliable text/JSON APIs
+      const ipApis = [
+        "https://api64.ipify.org?format=json",
+        "https://api.ipify.org?format=json",
+        "https://ipinfo.io/json", // can also fetch IP
+        "https://icanhazip.com" // plain text fallback
+      ];
+
+      for (const url of ipApis) {
+        try {
+          const response = await fetch(url);
+          if (response.ok) {
+            if (url.includes("json")) {
+              const data = await response.json();
+              userIp = data.ip || data.ipAddress || "Unknown";
+            } else {
+              const text = await response.text();
+              userIp = text.trim();
+            }
+            if (userIp && userIp !== "Unknown") {
+              break; // Successfully got the IP
+            }
+          }
+        } catch (err) {
+          console.warn(`IP API ${url} failed:`, err);
+        }
+      }
+
       let geoInfo = {
-        ip: "Unknown",
+        ip: userIp,
         country: "Unknown",
         city: "Unknown",
         region: "Unknown",
@@ -328,61 +358,80 @@ export default function Home() {
         postal: "Unknown"
       };
 
-      // Since client-side requests to ipwho.is or other APIs can sometimes fail due to CORS,
-      // we use a fully secure fallback mechanism with multiple endpoint configurations.
-      const geoApis = [
-        {
-          url: "https://ipapi.co/json/",
-          parser: (data: any) => ({
-            ip: data.ip || "Unknown",
-            country: data.country_name || "Unknown",
-            city: data.city || "Unknown",
-            region: data.region || "Unknown",
-            org: data.org || "Unknown",
-            postal: data.postal || "Unknown"
-          })
-        },
-        {
-          url: "https://ipwho.is/",
-          parser: (data: any) => {
-            if (!data.success) throw new Error("ipwho.is reported failure");
-            return {
-              ip: data.ip || "Unknown",
-              country: data.country || "Unknown",
+      // Step 2: Use the explicitly retrieved IP address to query geo-location APIs
+      if (userIp !== "Unknown") {
+        const geoApis = [
+          {
+            url: `https://ipwho.is/${userIp}`,
+            parser: (data: any) => {
+              if (!data.success) throw new Error("ipwho.is reported failure");
+              return {
+                ip: userIp,
+                country: data.country || "Unknown",
+                city: data.city || "Unknown",
+                region: data.region || "Unknown",
+                org: data.connection?.isp || data.connection?.asn || "Unknown",
+                postal: data.postal || "Unknown"
+              };
+            }
+          },
+          {
+            url: `https://ipapi.co/${userIp}/json/`,
+            parser: (data: any) => ({
+              ip: userIp,
+              country: data.country_name || "Unknown",
               city: data.city || "Unknown",
               region: data.region || "Unknown",
-              org: data.connection?.isp || data.connection?.asn || "Unknown",
+              org: data.org || "Unknown",
               postal: data.postal || "Unknown"
-            };
+            })
+          },
+          {
+            url: `https://freeipapi.com/api/json/${userIp}`,
+            parser: (data: any) => ({
+              ip: userIp,
+              country: data.countryName || "Unknown",
+              city: data.cityName || "Unknown",
+              region: data.regionName || "Unknown",
+              org: "Unknown (FreeIPAPI)",
+              postal: data.zipCode || "Unknown"
+            })
           }
-        },
-        {
-          url: "https://freeipapi.com/api/json",
-          parser: (data: any) => ({
-            ip: data.ipAddress || "Unknown",
-            country: data.countryName || "Unknown",
-            city: data.cityName || "Unknown",
-            region: data.regionName || "Unknown",
-            org: "Unknown (FreeIPAPI)",
-            postal: data.zipCode || "Unknown"
-          })
-        }
-      ];
+        ];
 
-      // Execute APIs in order until one succeeds
-      for (const api of geoApis) {
-        try {
-          const response = await fetch(api.url);
-          if (response.ok) {
-            const data = await response.json();
-            const parsed = api.parser(data);
-            if (parsed.ip !== "Unknown") {
+        // Execute Geo APIs in order until one succeeds
+        for (const api of geoApis) {
+          try {
+            const response = await fetch(api.url);
+            if (response.ok) {
+              const data = await response.json();
+              const parsed = api.parser(data);
               geoInfo = parsed;
               break; // Success! Exit loop.
             }
+          } catch (err) {
+            console.warn(`Geo API ${api.url} failed:`, err);
+          }
+        }
+      } else {
+        // Fallback: If IP retrieval failed, try blind geo lookup as a last resort
+        try {
+          const response = await fetch("https://ipwho.is/");
+          if (response.ok) {
+            const data = await response.json();
+            if (data && data.success) {
+              geoInfo = {
+                ip: data.ip || "Unknown",
+                country: data.country || "Unknown",
+                city: data.city || "Unknown",
+                region: data.region || "Unknown",
+                org: data.connection?.isp || "Unknown",
+                postal: data.postal || "Unknown"
+              };
+            }
           }
         } catch (err) {
-          console.warn(`Geo API ${api.url} failed:`, err);
+          console.error("Blind fallback geo lookup failed:", err);
         }
       }
 
