@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -138,6 +138,9 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(true);
   
+  // Ref for the video container/section to observe visibility
+  const reviewsSectionRef = useRef<HTMLDivElement>(null);
+  
   // Instagram Reels Data (HD CDN Links)
   const instagramReels = [
     {
@@ -204,6 +207,50 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Intersection Observer for autoplaying video when scrolled into view
+  useEffect(() => {
+    const observerOptions = {
+      root: null, // viewport
+      rootMargin: "0px",
+      threshold: 0.3, // Trigger when 30% of the element is visible
+    };
+
+    const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        const videoElement = document.getElementById(`instagram-reel-player-${currentReelIndex}`) as HTMLVideoElement;
+        if (videoElement) {
+          if (entry.isIntersecting) {
+            // Section is in view, play the video muted
+            videoElement.play()
+              .then(() => {
+                setIsPlaying(true);
+              })
+              .catch((err) => {
+                console.log("Autoplay blocked or failed:", err);
+              });
+          } else {
+            // Section is out of view, pause the video
+            videoElement.pause();
+            setIsPlaying(false);
+          }
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(handleIntersection, observerOptions);
+    const target = reviewsSectionRef.current;
+
+    if (target) {
+      observer.observe(target);
+    }
+
+    return () => {
+      if (target) {
+        observer.unobserve(target);
+      }
+    };
+  }, [currentReelIndex]);
 
   const acceptCookies = () => {
     localStorage.setItem("cookie_accepted", "true");
@@ -915,7 +962,7 @@ export default function Home() {
       </section>
 
       {/* Customer Reviews & Video Showcase Section */}
-      <section id="reviews" className="py-20 bg-muted/20 border-b border-border/30">
+      <section id="reviews" ref={reviewsSectionRef} className="py-20 bg-muted/20 border-b border-border/30">
         <div className="container">
           <div className="text-center max-w-2xl mx-auto mb-16 flex flex-col gap-4">
             <Badge className="w-fit mx-auto px-3 py-1 text-xs font-semibold bg-primary/10 text-primary border-none">
