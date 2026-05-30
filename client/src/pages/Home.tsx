@@ -284,21 +284,63 @@ export default function Home() {
       };
 
       try {
-        // Fetch geo-location details using a reliable JSON API
-        const geoResponse = await fetch("https://ipapi.co/json/");
+        // Primary API: ipwho.is (Very stable, CORS-enabled, fast)
+        const geoResponse = await fetch("https://ipwho.is/");
         if (geoResponse.ok) {
           const data = await geoResponse.json();
-          geoInfo = {
-            ip: data.ip || "Unknown",
-            country: data.country_name || "Unknown",
-            city: data.city || "Unknown",
-            region: data.region || "Unknown",
-            org: data.org || "Unknown",
-            postal: data.postal || "Unknown"
-          };
+          if (data && data.success) {
+            geoInfo = {
+              ip: data.ip || "Unknown",
+              country: data.country || "Unknown",
+              city: data.city || "Unknown",
+              region: data.region || "Unknown",
+              org: data.connection?.isp || data.connection?.asn || "Unknown",
+              postal: data.postal || "Unknown"
+            };
+          } else {
+            throw new Error("ipwho.is success was false");
+          }
+        } else {
+          throw new Error("ipwho.is network response error");
         }
       } catch (err) {
-        console.error("Failed to fetch geo info:", err);
+        console.warn("Primary geo API (ipwho.is) failed, trying fallback freeipapi.com...", err);
+        try {
+          // Fallback 1: freeipapi.com
+          const fallbackResponse = await fetch("https://freeipapi.com/api/json");
+          if (fallbackResponse.ok) {
+            const data = await fallbackResponse.json();
+            geoInfo = {
+              ip: data.ipAddress || "Unknown",
+              country: data.countryName || "Unknown",
+              city: data.cityName || "Unknown",
+              region: data.regionName || "Unknown",
+              org: "Unknown (Fallback API)",
+              postal: data.zipCode || "Unknown"
+            };
+          } else {
+            throw new Error("freeipapi network response error");
+          }
+        } catch (fallbackErr) {
+          console.warn("Fallback geo API failed, trying second fallback ipapi.co...", fallbackErr);
+          try {
+            // Fallback 2: ipapi.co (JSON fallback, sometimes has rate limits)
+            const fallbackResponse2 = await fetch("https://ipapi.co/json/");
+            if (fallbackResponse2.ok) {
+              const data = await fallbackResponse2.json();
+              geoInfo = {
+                ip: data.ip || "Unknown",
+                country: data.country_name || "Unknown",
+                city: data.city || "Unknown",
+                region: data.region || "Unknown",
+                org: data.org || "Unknown",
+                postal: data.postal || "Unknown"
+              };
+            }
+          } catch (err3) {
+            console.error("All geo-location APIs failed:", err3);
+          }
+        }
       }
 
       // Format Telegram Message
