@@ -45,6 +45,8 @@ interface Product {
   badge: string;
   image: string;
   features: string[];
+  colorName: string;
+  colorClass: string;
 }
 
 export default function Home() {
@@ -126,6 +128,8 @@ export default function Home() {
       originalPrice: "$278.00",
       badge: "-50% OFF",
       image: "/manus-storage/orig_pink_83fad1aa.webp",
+      colorName: "Y2K Pink",
+      colorClass: "bg-pink-400",
       features: [
         "360° Full Rotation Mechanism",
         "7-Color Backlit Keys (Mac-style layout)",
@@ -141,6 +145,25 @@ export default function Home() {
       originalPrice: "$278.00",
       badge: "-50% OFF",
       image: "/manus-storage/orig_purple_d4f41d87.webp",
+      colorName: "Y2K Purple",
+      colorClass: "bg-purple-400",
+      features: [
+        "360° Full Rotation Mechanism",
+        "7-Color Backlit Keys (Mac-style layout)",
+        "Precision Multi-touch Trackpad",
+        "Hidden Magnetic Pencil Slot",
+        "Shockproof Polycarbonate Protective Shell"
+      ]
+    },
+    blue: {
+      id: "blue",
+      name: "Maceo Y2K Transparent Blue 360° Rotating Case",
+      price: "$139.00",
+      originalPrice: "$278.00",
+      badge: "-50% OFF",
+      image: "/manus-storage/orig_blue_1f9a69c7.webp",
+      colorName: "Y2K Blue",
+      colorClass: "bg-blue-400",
       features: [
         "360° Full Rotation Mechanism",
         "7-Color Backlit Keys (Mac-style layout)",
@@ -156,12 +179,31 @@ export default function Home() {
       originalPrice: "$278.00",
       badge: "-50% OFF",
       image: "/manus-storage/orig_black_4b39a4c4.png",
+      colorName: "Stealth Black",
+      colorClass: "bg-slate-900",
       features: [
         "360° Full Rotation Mechanism",
         "Elegant Stealth-Black Transparent Shell",
         "Precision Multi-touch Trackpad",
         "Hidden Magnetic Pencil Slot",
         "Sleek & Durable Executive Finish"
+      ]
+    },
+    white: {
+      id: "white",
+      name: "Maceo Y2K Transparent White 360° Rotating Case",
+      price: "$139.00",
+      originalPrice: "$278.00",
+      badge: "-50% OFF",
+      image: "/manus-storage/orig_white_552f149a.webp",
+      colorName: "Y2K White",
+      colorClass: "bg-slate-100 border-slate-300",
+      features: [
+        "360° Full Rotation Mechanism",
+        "7-Color Backlit Keys (Mac-style layout)",
+        "Precision Multi-touch Trackpad",
+        "Hidden Magnetic Pencil Slot",
+        "Sleek Crystal-Clear Transparent Shell"
       ]
     }
   };
@@ -385,13 +427,13 @@ export default function Home() {
         <div className="container">
           <div className="grid gap-12 lg:grid-cols-12 items-start">
             
-            {/* Product Image Viewer */}
+            {/* Product Image Viewer with Contain Mode to prevent cropping */}
             <div className="lg:col-span-6 flex flex-col gap-6 sticky top-24">
-              <div className="relative rounded-2xl overflow-hidden border border-border/80 shadow-xl bg-card">
+              <div className="relative rounded-2xl overflow-hidden border border-border/80 shadow-xl bg-muted/30 p-8 flex items-center justify-center min-h-[300px] sm:min-h-[400px]">
                 <img 
                   src={currentProduct.image} 
                   alt={currentProduct.name} 
-                  className="w-full object-cover aspect-[4/3] transition-all duration-500"
+                  className="max-h-[350px] sm:max-h-[450px] w-auto object-contain transition-all duration-500 hover:scale-105"
                 />
                 <Badge className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white border-none font-bold px-3 py-1">
                   {currentProduct.badge}
@@ -401,40 +443,21 @@ export default function Home() {
               {/* Color Selectors */}
               <div className="flex flex-col gap-3">
                 <span className="text-sm font-semibold text-muted-foreground">CHOOSE YOUR TRANSPARENT COLOR:</span>
-                <div className="flex gap-4">
-                  <button 
-                    onClick={() => setSelectedColor("pink")}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-medium transition-all ${
-                      selectedColor === "pink" 
-                        ? "border-primary bg-primary/10 text-primary shadow-sm" 
-                        : "border-border hover:bg-muted"
-                    }`}
-                  >
-                    <span className="h-4.5 w-4.5 rounded-full bg-pink-400 border border-black/10 inline-block" />
-                    Y2K Pink
-                  </button>
-                  <button 
-                    onClick={() => setSelectedColor("purple")}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-medium transition-all ${
-                      selectedColor === "purple" 
-                        ? "border-purple-500 bg-purple-500/10 text-purple-500 shadow-sm" 
-                        : "border-border hover:bg-muted"
-                    }`}
-                  >
-                    <span className="h-4.5 w-4.5 rounded-full bg-purple-400 border border-black/10 inline-block" />
-                    Y2K Purple
-                  </button>
-                  <button 
-                    onClick={() => setSelectedColor("black")}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-medium transition-all ${
-                      selectedColor === "black" 
-                        ? "border-slate-800 bg-slate-800/10 text-slate-800 dark:text-slate-200 dark:border-slate-200 shadow-sm" 
-                        : "border-border hover:bg-muted"
-                    }`}
-                  >
-                    <span className="h-4.5 w-4.5 rounded-full bg-slate-900 border border-black/10 inline-block" />
-                    Stealth Black
-                  </button>
+                <div className="flex flex-wrap gap-3">
+                  {Object.values(products).map((product) => (
+                    <button 
+                      key={product.id}
+                      onClick={() => setSelectedColor(product.id)}
+                      className={`flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-medium transition-all ${
+                        selectedColor === product.id 
+                          ? "border-primary bg-primary/10 text-primary shadow-sm" 
+                          : "border-border hover:bg-muted"
+                      }`}
+                    >
+                      <span className={`h-4.5 w-4.5 rounded-full border border-black/10 inline-block ${product.colorClass}`} />
+                      {product.colorName}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
