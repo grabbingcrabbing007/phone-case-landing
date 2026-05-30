@@ -167,7 +167,7 @@ export default function Home() {
         setCompatibilityResult({
           status: "fail",
           message: "⚠️ Not Compatible",
-          details: `Unfortunately, ${model.name} is not compatible with our 11-inch 360° Rotating series. We currently only support iPad Pro 11", iPad Air 10.9"/11", and iPad 10th Gen.`
+          details: `Unfortunately, ${model.name} is not compatible with our 11-inch 360° Rotating series. We currently only support iPad Pro 11\", iPad Air 10.9\"/11\", and iPad 10th Gen.`
         });
       }
     }
@@ -790,18 +790,22 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Floating Buy Now Button with Tooltip */}
+      {/* Floating Buy Now Button with Tooltip and soft pulse ring wrapper */}
       {showFloatingBtn && (
         <div className="fixed bottom-6 right-6 z-40 animate-in slide-in-from-bottom-10 duration-300">
           <TooltipProvider delayDuration={100}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold px-6 py-6 rounded-full shadow-2xl shadow-primary/40 flex items-center gap-2 border border-white/20 hover:scale-105 active:scale-95 transition-all">
-                  <a href={PURCHASE_LINK} target="_blank" rel="noopener noreferrer">
-                    <ShoppingCart className="h-5 w-5" />
-                    <span>Buy Now - 50% OFF</span>
-                  </a>
-                </Button>
+                <div className="relative group">
+                  {/* Pulse wave background ring */}
+                  <div className="absolute inset-0 rounded-full bg-primary/40 animate-ping opacity-75 pointer-events-none" style={{ animationDuration: '2.5s' }} />
+                  <Button asChild size="lg" className="relative bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold px-6 py-6 rounded-full shadow-2xl shadow-primary/40 flex items-center gap-2 border border-white/20 hover:scale-105 active:scale-95 transition-all">
+                    <a href={PURCHASE_LINK} target="_blank" rel="noopener noreferrer">
+                      <ShoppingCart className="h-5 w-5" />
+                      <span>Buy Now - 50% OFF</span>
+                    </a>
+                  </Button>
+                </div>
               </TooltipTrigger>
               <TooltipContent side="top" align="center" className="bg-red-500 text-white border-none font-bold text-xs px-3 py-1.5 rounded-lg shadow-lg mb-2">
                 Limited Offer
