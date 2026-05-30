@@ -573,8 +573,8 @@ export default function Home() {
         <div className="container">
           <div className="grid gap-12 lg:grid-cols-12 items-start">
             
-            {/* Product Image Viewer with Contain Mode to prevent cropping */}
-            <div className="lg:col-span-6 flex flex-col gap-6 sticky top-24">
+            {/* Product Image Viewer - STICKY ONLY ON DESKTOP (lg:sticky) to prevent mobile overlay bug */}
+            <div className="lg:col-span-6 flex flex-col gap-6 lg:sticky lg:top-24">
               <div className="relative rounded-2xl overflow-hidden border border-border/80 shadow-xl bg-muted/30 p-8 flex items-center justify-center min-h-[300px] sm:min-h-[400px]">
                 <img 
                   src={currentProduct.image} 
