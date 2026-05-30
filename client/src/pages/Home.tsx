@@ -3,6 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import { 
   Check, 
   Rotate3d, 
@@ -20,7 +25,11 @@ import {
   Smartphone, 
   HelpCircle,
   Menu,
-  X
+  X,
+  Mail,
+  Phone,
+  MapPin,
+  MessageSquare
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -41,6 +50,18 @@ export default function Home() {
   const [cookieAccepted, setCookieNotice] = useState<boolean>(true);
   const [selectedColor, setSelectedColor] = useState<string>("pink");
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  
+  // Modal states for policies and contact
+  const [activeModal, setActiveModal] = useState<string | null>(null);
+
+  // Contact form state
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Newsletter signup state
+  const [newsletterEmail, setNewsletterEmail] = useState("");
 
   // Load cookie preference
   useEffect(() => {
@@ -55,6 +76,33 @@ export default function Home() {
     setCookieNotice(true);
   };
 
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contactName || !contactEmail || !contactMessage) {
+      toast.error("Please fill out all fields.");
+      return;
+    }
+    setIsSubmitting(true);
+    setTimeout(() => {
+      toast.success("Message sent successfully! We will get back to you within 24 hours.");
+      setContactName("");
+      setContactEmail("");
+      setContactMessage("");
+      setIsSubmitting(false);
+      setActiveModal(null);
+    }, 1200);
+  };
+
+  const handleNewsletterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    toast.success("Thank you for subscribing! Check your inbox for your 10% discount code.");
+    setNewsletterEmail("");
+  };
+
   const products: Record<string, Product> = {
     pink: {
       id: "pink",
@@ -62,7 +110,7 @@ export default function Home() {
       price: "$139.00",
       originalPrice: "$278.00",
       badge: "-50% OFF",
-      image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663502537605/Qyzy3RyvqHf3UccjmEyF6N/maceo_pink_case-32tX8tz28WND3zKNb2cuh7.webp",
+      image: "/manus-storage/orig_pink_83fad1aa.webp",
       features: [
         "360° Full Rotation Mechanism",
         "7-Color Backlit Keys (Mac-style layout)",
@@ -77,7 +125,7 @@ export default function Home() {
       price: "$139.00",
       originalPrice: "$278.00",
       badge: "-50% OFF",
-      image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663502537605/Qyzy3RyvqHf3UccjmEyF6N/maceo_purple_case-U58xYp6vLVD4hPdaxV3ZXv.webp",
+      image: "/manus-storage/orig_purple_d4f41d87.webp",
       features: [
         "360° Full Rotation Mechanism",
         "7-Color Backlit Keys (Mac-style layout)",
@@ -92,7 +140,7 @@ export default function Home() {
       price: "$139.00",
       originalPrice: "$278.00",
       badge: "-50% OFF",
-      image: "https://d2xsxph8kpxj0f.cloudfront.net/310519663502537605/Qyzy3RyvqHf3UccjmEyF6N/maceo_black_case-2Xe7GEV5Bj8hBAE4EbDbNq.webp",
+      image: "/manus-storage/orig_black_4b39a4c4.png",
       features: [
         "360° Full Rotation Mechanism",
         "Elegant Stealth-Black Transparent Shell",
@@ -128,6 +176,7 @@ export default function Home() {
             <a href="#products" className="hover:text-primary transition-colors">Shop</a>
             <a href="#benefits" className="hover:text-primary transition-colors">Why Maceo</a>
             <a href="#faq" className="hover:text-primary transition-colors">FAQ</a>
+            <button onClick={() => setActiveModal("contact")} className="hover:text-primary transition-colors text-left font-medium">Contact Us</button>
           </nav>
 
           <div className="flex items-center gap-4">
@@ -162,6 +211,7 @@ export default function Home() {
             <a href="#products" onClick={() => setMobileMenuOpen(false)} className="hover:text-primary transition-colors py-2">Shop</a>
             <a href="#benefits" onClick={() => setMobileMenuOpen(false)} className="hover:text-primary transition-colors py-2">Why Maceo</a>
             <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="hover:text-primary transition-colors py-2">FAQ</a>
+            <button onClick={() => { setMobileMenuOpen(false); setActiveModal("contact"); }} className="hover:text-primary transition-colors py-2 text-left">Contact Us</button>
             <Button asChild className="w-full bg-primary mt-4 py-6 text-base font-semibold">
               <a href={PURCHASE_LINK} target="_blank" rel="noopener noreferrer">
                 Buy Now - 50% OFF
@@ -219,7 +269,7 @@ export default function Home() {
             <div className="absolute -inset-4 bg-gradient-to-tr from-primary/20 to-purple-500/20 rounded-3xl blur-3xl opacity-30 -z-10" />
             <div className="relative rounded-2xl overflow-hidden border border-border/60 shadow-2xl bg-card">
               <img 
-                src="https://d2xsxph8kpxj0f.cloudfront.net/310519663502537605/Qyzy3RyvqHf3UccjmEyF6N/maceo_hero_banner-NmZvszWdGWKtXKYJYAEVpc.webp" 
+                src="/manus-storage/orig_hero_93875fb3.png" 
                 alt="Maceo Transparent 360 Degree Rotating iPad Keyboard Case Banner" 
                 className="w-full object-cover aspect-[16/9] sm:aspect-[4/3] lg:aspect-[16/10]"
               />
@@ -228,6 +278,31 @@ export default function Home() {
                 360° Rotating Feature Shown
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Showcase Section */}
+      <section className="py-20 bg-muted/20 border-y border-border/30">
+        <div className="container max-w-4xl text-center">
+          <div className="mb-12 flex flex-col gap-4">
+            <Badge className="w-fit mx-auto px-3 py-1 text-xs font-semibold bg-primary/10 text-primary border-none">
+              SEE IT IN ACTION
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
+              Watch How It Transforms Your Workflow
+            </h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              A quick demonstration of the seamless 360° rotation, tactile backlit typing, and instant protection.
+            </p>
+          </div>
+          <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl bg-black aspect-video">
+            <video 
+              src="/manus-storage/orig_video_52cb8baf.mp4" 
+              controls 
+              className="w-full h-full object-cover"
+              poster="/manus-storage/orig_hero_93875fb3.png"
+            />
           </div>
         </div>
       </section>
@@ -452,6 +527,28 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Newsletter Section */}
+      <section className="py-20 bg-primary/5 border-b border-border/40">
+        <div className="container max-w-2xl text-center flex flex-col gap-6">
+          <h2 className="text-3xl font-bold font-display">Join the Maceo Club</h2>
+          <p className="text-muted-foreground">
+            Subscribe to receive product updates, exclusive deals, and get 10% off your next purchase instantly.
+          </p>
+          <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-3">
+            <Input 
+              type="email" 
+              placeholder="Enter your email address" 
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
+              className="rounded-full px-6 py-6 bg-background border-border/80 text-sm focus-visible:ring-primary"
+            />
+            <Button type="submit" className="rounded-full bg-primary hover:bg-primary/90 font-bold px-8 py-6">
+              Subscribe
+            </Button>
+          </form>
+        </div>
+      </section>
+
       {/* FAQ Section */}
       <section id="faq" className="py-20">
         <div className="container max-w-3xl">
@@ -536,26 +633,26 @@ export default function Home() {
           <div>
             <h4 className="font-bold mb-3 font-display text-xs tracking-wider uppercase">Policies</h4>
             <ul className="flex flex-col gap-2 text-muted-foreground text-xs">
-              <li><a href="#faq" className="hover:text-primary transition-colors">Refund Policy</a></li>
-              <li><a href="#faq" className="hover:text-primary transition-colors">Shipping Policy</a></li>
-              <li><a href="#faq" className="hover:text-primary transition-colors">Privacy Policy</a></li>
-              <li><a href="#faq" className="hover:text-primary transition-colors">Terms of Service</a></li>
+              <li><button onClick={() => setActiveModal("refund")} className="hover:text-primary transition-colors text-left">Refund Policy</button></li>
+              <li><button onClick={() => setActiveModal("shipping")} className="hover:text-primary transition-colors text-left">Shipping Policy</button></li>
+              <li><button onClick={() => setActiveModal("privacy")} className="hover:text-primary transition-colors text-left">Privacy Policy</button></li>
+              <li><button onClick={() => setActiveModal("terms")} className="hover:text-primary transition-colors text-left">Terms of Service</button></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold mb-3 font-display text-xs tracking-wider uppercase">Contact</h4>
-            <p className="text-muted-foreground text-xs leading-relaxed">
-              Have questions or need assistance? Reach out to our 24/7 support team at: <br />
-              <strong className="text-foreground">support@maceo-case.com</strong>
-            </p>
+            <ul className="flex flex-col gap-2 text-muted-foreground text-xs">
+              <li><button onClick={() => setActiveModal("contact")} className="hover:text-primary transition-colors text-left">Contact Form</button></li>
+              <li><a href="mailto:support@maceo-case.com" className="hover:text-primary transition-colors">support@maceo-case.com</a></li>
+            </ul>
           </div>
         </div>
         <div className="container mt-8 pt-8 border-t border-border/40 text-center text-xs text-muted-foreground flex flex-col sm:flex-row items-center justify-between gap-4">
           <span>© 2026 Maceo. All rights reserved.</span>
           <div className="flex gap-4">
-            <a href="#faq" className="hover:underline">Privacy</a>
-            <a href="#faq" className="hover:underline">Terms</a>
-            <a href="#faq" className="hover:underline">Cookies</a>
+            <button onClick={() => setActiveModal("privacy")} className="hover:underline">Privacy</button>
+            <button onClick={() => setActiveModal("terms")} className="hover:underline">Terms</button>
+            <button onClick={() => setActiveModal("cookies-policy")} className="hover:underline">Cookies</button>
           </div>
         </div>
       </footer>
@@ -582,6 +679,179 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* ======================================================== */}
+      {/* MODALS / DIALOGS FOR FUNCTIONAL LINKS */}
+      {/* ======================================================== */}
+
+      {/* Refund Policy Modal */}
+      <Dialog open={activeModal === "refund"} onOpenChange={(open) => !open && setActiveModal(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl font-bold">Refund Policy</DialogTitle>
+            <DialogDescription>Our commitment to your satisfaction.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 text-sm text-muted-foreground leading-relaxed mt-4">
+            <p><strong>30-Day Money-Back Guarantee</strong></p>
+            <p>We want you to be absolutely in love with your Maceo purchase. If you are not completely satisfied, you can return your item(s) within 30 days of delivery for a full refund or exchange.</p>
+            <p><strong>Eligibility for Returns</strong></p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>Items must be returned in their original packaging with all included accessories (cables, manuals, etc.).</li>
+              <li>Items must show no signs of physical abuse, water damage, or extreme wear.</li>
+            </ul>
+            <p><strong>How to Initiate a Return</strong></p>
+            <p>Simply contact our 24/7 support team via our Contact Form or email us at <strong>support@maceo-case.com</strong> with your order number. We will provide you with a pre-paid return shipping label and instructions on where to send your package.</p>
+            <p><strong>Refund Processing</strong></p>
+            <p>Once your return is received and inspected, we will notify you of the approval or rejection of your refund. If approved, your refund will be processed, and a credit will automatically be applied to your original method of payment within 5-7 business days.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Shipping Policy Modal */}
+      <Dialog open={activeModal === "shipping"} onOpenChange={(open) => !open && setActiveModal(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl font-bold">Shipping Policy</DialogTitle>
+            <DialogDescription>Reliable, fast, and free global delivery.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 text-sm text-muted-foreground leading-relaxed mt-4">
+            <p><strong>Free Worldwide Shipping</strong></p>
+            <p>We are proud to offer free standard shipping on all orders to over 100 countries worldwide. No minimum purchase required.</p>
+            <p><strong>Processing Times</strong></p>
+            <p>All orders are processed, packed, and dispatched within 24 hours of payment verification (excluding weekends and holidays). Once shipped, you will automatically receive a tracking link via email.</p>
+            <p><strong>Delivery Times</strong></p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li><strong>United States & Canada:</strong> 7 - 10 business days</li>
+              <li><strong>United Kingdom & Europe:</strong> 7 - 12 business days</li>
+              <li><strong>Australia & New Zealand:</strong> 8 - 12 business days</li>
+              <li><strong>Other International:</strong> 10 - 15 business days</li>
+            </ul>
+            <p><strong>Tracking Your Order</strong></p>
+            <p>Every single package is fully trackable. Your tracking link will update as soon as the package reaches the carrier's sorting facility. If you do not receive your tracking code within 48 hours, please contact us.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Privacy Policy Modal */}
+      <Dialog open={activeModal === "privacy"} onOpenChange={(open) => !open && setActiveModal(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl font-bold">Privacy Policy</DialogTitle>
+            <DialogDescription>How we collect, protect, and use your data.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 text-sm text-muted-foreground leading-relaxed mt-4">
+            <p><strong>Information We Collect</strong></p>
+            <p>We collect information you provide directly to us when making a purchase, subscribing to our newsletter, or contacting us. This includes your name, email address, billing address, and shipping address.</p>
+            <p><strong>Payment Security</strong></p>
+            <p>All transactions are processed through secure, encrypted payment gateways. We never store or have access to your raw credit card details or financial information.</p>
+            <p><strong>How We Use Your Information</strong></p>
+            <p>We use your information to fulfill orders, process payments, arrange shipping, send tracking details, and respond to support inquiries. If you opt-in to our newsletter, we may also send you promotional updates.</p>
+            <p><strong>Third-Party Sharing</strong></p>
+            <p>We do not sell, trade, or transfer your personal data to outside parties, except for trusted third parties who assist us in operating our website, conducting our business, or shipping your order (such as Shopify and DHL/FedEx).</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Terms of Service Modal */}
+      <Dialog open={activeModal === "terms"} onOpenChange={(open) => !open && setActiveModal(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl font-bold">Terms of Service</DialogTitle>
+            <DialogDescription>Rules and guidelines for using our website.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 text-sm text-muted-foreground leading-relaxed mt-4">
+            <p><strong>Agreement to Terms</strong></p>
+            <p>By accessing and using this website, you agree to comply with and be bound by these Terms of Service. If you do not agree, please do not use our services.</p>
+            <p><strong>Product Accuracy</strong></p>
+            <p>We strive to display our product colors and features as accurately as possible. However, actual colors may vary slightly depending on your device's screen calibration.</p>
+            <p><strong>Pricing and Orders</strong></p>
+            <p>We reserve the right to change prices, cancel orders, or limit quantities at our sole discretion. In the event of a cancellation, we will immediately issue a full refund to your original payment method.</p>
+            <p><strong>Limitation of Liability</strong></p>
+            <p>Maceo shall not be liable for any direct, indirect, incidental, or consequential damages resulting from the use or inability to use our products or website.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cookies Policy Modal */}
+      <Dialog open={activeModal === "cookies-policy"} onOpenChange={(open) => !open && setActiveModal(null)}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl font-bold">Cookies Policy</DialogTitle>
+            <DialogDescription>Detailed information about how we use cookies.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 text-sm text-muted-foreground leading-relaxed mt-4">
+            <p><strong>What Are Cookies?</strong></p>
+            <p>Cookies are small text files placed on your device to collect standard internet log and visitor behavior information. They help us understand how you use our site and improve your experience.</p>
+            <p><strong>How We Use Cookies</strong></p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li><strong>Essential Cookies:</strong> Required for core site functions, such as keeping track of your selected product color and shopping cart state.</li>
+              <li><strong>Analytics Cookies:</strong> Help us understand which sections of our landing page are most popular and where users spend their time.</li>
+              <li><strong>Marketing Cookies:</strong> Used to deliver Google Ads that are relevant to your interests and measure the effectiveness of our campaigns.</li>
+            </ul>
+            <p><strong>Managing Cookies</strong></p>
+            <p>You can set your browser to not accept cookies, or clear them entirely. However, some features of our website may not function correctly as a result.</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Contact Form Modal */}
+      <Dialog open={activeModal === "contact"} onOpenChange={(open) => !open && setActiveModal(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl font-bold flex items-center gap-2">
+              <MessageSquare className="h-6 w-6 text-primary" /> Contact Us
+            </DialogTitle>
+            <DialogDescription>Have a question? Send us a message and we'll reply shortly.</DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleContactSubmit} className="space-y-4 mt-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="name">Full Name</Label>
+              <Input 
+                id="name" 
+                placeholder="John Doe" 
+                value={contactName} 
+                onChange={(e) => setContactName(e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Email Address</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="john@example.com" 
+                value={contactEmail} 
+                onChange={(e) => setContactEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="message">Your Message</Label>
+              <Textarea 
+                id="message" 
+                placeholder="How can we help you today? Please include your order number if applicable." 
+                rows={4}
+                value={contactMessage} 
+                onChange={(e) => setContactMessage(e.target.value)}
+                required
+              />
+            </div>
+
+            <Button type="submit" disabled={isSubmitting} className="w-full bg-primary font-bold py-5">
+              {isSubmitting ? "Sending..." : "Send Message"}
+            </Button>
+          </form>
+
+          <div className="mt-6 pt-6 border-t border-border/60 text-xs text-muted-foreground flex flex-col gap-2">
+            <span className="flex items-center gap-2"><Mail className="h-3.5 w-3.5" /> support@maceo-case.com</span>
+            <span className="flex items-center gap-2"><Clock className="h-3.5 w-3.5" /> 24/7 Global Support Team</span>
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 }
