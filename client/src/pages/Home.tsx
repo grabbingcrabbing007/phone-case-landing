@@ -1092,22 +1092,22 @@ export default function Home() {
       )}
 
       {/* ======================================================== */}
-      {/* REDESIGNED SECURE CHECKOUT MODAL (Stripe-Like, Responsive) */}
+      {/* PERFECTED SECURE CHECKOUT MODAL (Wide, Spacious Desktop Layout) */}
       {/* ======================================================== */}
       <Dialog open={activeModal === "checkout"} onOpenChange={(open) => !open && setActiveModal(null)}>
-        <DialogContent className="max-w-4xl max-h-[92vh] md:max-h-[85vh] overflow-y-auto p-0 rounded-2xl border border-border bg-background shadow-2xl">
+        <DialogContent className="max-w-5xl md:max-w-5xl w-[95vw] max-h-[92vh] md:max-h-[85vh] overflow-y-auto p-0 rounded-2xl border border-border bg-background shadow-2xl">
           <div className="grid md:grid-cols-12 h-full">
             
             {/* Left Column: Form Details (7 cols) */}
-            <div className="md:col-span-7 p-6 sm:p-8 space-y-8">
+            <div className="md:col-span-7 p-6 sm:p-10 space-y-8">
               
               {/* Secure Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-border/40">
+              <div className="flex items-center justify-between pb-5 border-b border-border/40">
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400 font-bold tracking-wider uppercase">
                     <Lock className="h-3.5 w-3.5 stroke-[2.5]" /> Secure Checkout
                   </div>
-                  <DialogTitle className="font-display text-2xl font-extrabold tracking-tight">Maceo Order Form</DialogTitle>
+                  <DialogTitle className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight">Maceo Order Form</DialogTitle>
                 </div>
               </div>
 
@@ -1124,7 +1124,7 @@ export default function Home() {
                     <div className="space-y-2">
                       <Label htmlFor="checkout-color" className="text-xs font-semibold text-muted-foreground">Select Color</Label>
                       <Select value={checkoutColor} onValueChange={setCheckoutColor}>
-                        <SelectTrigger id="checkout-color" className="rounded-xl bg-background border-border/80 text-xs h-12 focus:ring-primary">
+                        <SelectTrigger id="checkout-color" className="rounded-xl bg-background border-border/80 text-xs h-12 focus:ring-primary w-full">
                           <SelectValue placeholder="Select Color" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1140,7 +1140,7 @@ export default function Home() {
                     <div className="space-y-2">
                       <Label htmlFor="checkout-model" className="text-xs font-semibold text-muted-foreground">iPad Model</Label>
                       <Select value={checkoutModel} onValueChange={setCheckoutModel}>
-                        <SelectTrigger id="checkout-model" className="rounded-xl bg-background border-border/80 text-xs h-12 focus:ring-primary">
+                        <SelectTrigger id="checkout-model" className="rounded-xl bg-background border-border/80 text-xs h-12 focus:ring-primary w-full">
                           <SelectValue placeholder="Select iPad Model" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1156,7 +1156,7 @@ export default function Home() {
                 </div>
 
                 {/* Section 2: Shipping details */}
-                <div className="space-y-4 pt-4 border-t border-border/40">
+                <div className="space-y-4 pt-5 border-t border-border/40">
                   <div className="flex items-center gap-2">
                     <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">2</div>
                     <h3 className="text-sm font-bold tracking-tight">Shipping Information</h3>
@@ -1184,7 +1184,7 @@ export default function Home() {
                           placeholder="john@example.com" 
                           value={shippingEmail} 
                           onChange={(e) => setShippingEmail(e.target.value)}
-                          className="rounded-xl h-12 text-xs border-border/80 focus-visible:ring-primary"
+                          className="rounded-xl h-12 text-xs border-border/80 focus-visible:ring-primary w-full"
                           required
                         />
                       </div>
@@ -1196,7 +1196,7 @@ export default function Home() {
                           placeholder="+1 (555) 000-0000" 
                           value={shippingPhone} 
                           onChange={(e) => setShippingPhone(e.target.value)}
-                          className="rounded-xl h-12 text-xs border-border/80 focus-visible:ring-primary"
+                          className="rounded-xl h-12 text-xs border-border/80 focus-visible:ring-primary w-full"
                           required
                         />
                       </div>
@@ -1283,13 +1283,13 @@ export default function Home() {
             </div>
 
             {/* Right Column: Order Summary (5 cols) */}
-            <div className="md:col-span-5 bg-muted/30 p-6 sm:p-8 border-t md:border-t-0 md:border-l border-border/40 flex flex-col justify-between">
+            <div className="md:col-span-5 bg-muted/30 p-6 sm:p-10 border-t md:border-t-0 md:border-l border-border/40 flex flex-col justify-between">
               <div className="space-y-6">
                 <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase block">Order Summary</span>
                 
-                {/* Premium Product Summary Card */}
-                <div className="p-4 bg-background rounded-2xl border border-border/60 shadow-sm space-y-4">
-                  <div className="h-40 bg-muted/40 rounded-xl p-4 flex items-center justify-center">
+                {/* Premium Product Summary Card - Fixed spacing to prevent badge overflow */}
+                <div className="p-5 bg-background rounded-2xl border border-border/60 shadow-sm space-y-4">
+                  <div className="h-48 bg-muted/40 rounded-xl p-4 flex items-center justify-center">
                     <img 
                       src={checkoutProduct.image} 
                       alt={checkoutProduct.name} 
@@ -1297,19 +1297,19 @@ export default function Home() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <span className="text-xs font-extrabold leading-tight block text-foreground">{checkoutProduct.name}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-primary font-extrabold">$138.00</span>
+                    <span className="text-sm font-extrabold leading-tight block text-foreground">{checkoutProduct.name}</span>
+                    <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                      <span className="text-base text-primary font-extrabold">$138.00</span>
                       <span className="text-xs text-muted-foreground line-through">$278.00</span>
-                      <Badge className="bg-red-500 text-white text-[9px] px-1.5 py-0 font-bold border-none">
+                      <Badge className="bg-red-500 text-white text-[10px] px-2 py-0.5 font-bold border-none">
                         50% OFF
                       </Badge>
                     </div>
-                    <div className="flex gap-2 pt-1">
-                      <Badge className="bg-primary/10 text-primary border-none text-[10px] font-bold px-2 py-0.5">
+                    <div className="flex flex-wrap gap-2 pt-1.5">
+                      <Badge className="bg-primary/10 text-primary border-none text-[10px] font-bold px-2.5 py-1">
                         {checkoutProduct.colorName}
                       </Badge>
-                      <Badge variant="outline" className="text-[10px] font-bold px-2 py-0.5 border-border/80">
+                      <Badge variant="outline" className="text-[10px] font-bold px-2.5 py-1 border-border/80">
                         11" Case
                       </Badge>
                     </div>
@@ -1342,14 +1342,14 @@ export default function Home() {
                 <div className="flex items-start gap-3 text-[10px] text-muted-foreground leading-relaxed">
                   <Truck className="h-5 w-5 text-primary shrink-0" />
                   <div>
-                    <span className="font-bold block text-foreground">Free Global Shipping</span>
+                    <span className="font-bold block text-foreground text-xs">Free Global Shipping</span>
                     Dispatched within 24 hours. Full tracking code sent via email.
                   </div>
                 </div>
                 <div className="flex items-start gap-3 text-[10px] text-muted-foreground leading-relaxed">
                   <ShieldCheck className="h-5 w-5 text-purple-500 shrink-0" />
                   <div>
-                    <span className="font-bold block text-foreground">30-Day Money-Back Guarantee</span>
+                    <span className="font-bold block text-foreground text-xs">30-Day Money-Back Guarantee</span>
                     If you are not 100% satisfied, returns are completely free.
                   </div>
                 </div>
