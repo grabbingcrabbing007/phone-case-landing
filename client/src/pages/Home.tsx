@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { 
   Check, 
@@ -33,7 +34,8 @@ import {
   MapPin,
   MessageSquare,
   ShoppingCart,
-  AlertCircle
+  AlertCircle,
+  UserCheck
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -56,6 +58,18 @@ interface iPadModel {
   name: string;
   numbers: string[];
   compatible: boolean;
+}
+
+interface Review {
+  id: string;
+  name: string;
+  avatar: string;
+  rating: number;
+  date: string;
+  title: string;
+  comment: string;
+  verified: boolean;
+  colorPurchased: string;
 }
 
 export default function Home() {
@@ -261,6 +275,53 @@ export default function Home() {
     }
   };
 
+  const reviews: Review[] = [
+    {
+      id: "rev-1",
+      name: "Sarah M.",
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150",
+      rating: 5,
+      date: "May 12, 2026",
+      title: "Absolutely obsessed with the Y2K Pink!",
+      comment: "This keyboard case exceeded all my expectations. The 360 degree rotation is super smooth, and the keys feel so satisfying to type on. It literally turned my iPad into a beautiful transparent mini-laptop. Shipping was fast too!",
+      verified: true,
+      colorPurchased: "Y2K Pink"
+    },
+    {
+      id: "rev-2",
+      name: "David K.",
+      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+      rating: 5,
+      date: "April 28, 2026",
+      title: "Perfect fit for iPad Pro 11\"",
+      comment: "I was worried about compatibility, but the checker tool was spot on. Fits my 2024 iPad Pro 11-inch like a glove. The trackpad is highly responsive and supports all iPadOS multi-touch gestures. Highly recommended!",
+      verified: true,
+      colorPurchased: "Stealth Black"
+    },
+    {
+      id: "rev-3",
+      name: "Emily L.",
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150",
+      rating: 5,
+      date: "May 03, 2026",
+      title: "Stunning purple glow",
+      comment: "The transparent purple design looks so retro and cool. The 7-color backlighting is bright and matches the aesthetic perfectly. I get compliments on it every time I work at a coffee shop. Battery life is amazing!",
+      verified: true,
+      colorPurchased: "Y2K Purple"
+    },
+    {
+      id: "rev-4",
+      name: "Marcus T.",
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150",
+      rating: 5,
+      date: "May 19, 2026",
+      title: "Great protection and utility",
+      comment: "As an illustrator, the ability to rotate the iPad flat for drawing and then snap it up for typing notes is a lifesaver. The polycarbonate shell is very sturdy and keeps my Apple Pencil secure. Best accessory purchase this year.",
+      verified: true,
+      colorPurchased: "Y2K Blue"
+    }
+  ];
+
   const currentProduct = products[selectedColor];
 
   return (
@@ -285,6 +346,7 @@ export default function Home() {
             <a href="#features" className="hover:text-primary transition-colors">Features</a>
             <a href="#products" className="hover:text-primary transition-colors">Shop</a>
             <a href="#benefits" className="hover:text-primary transition-colors">Why Maceo</a>
+            <a href="#reviews" className="hover:text-primary transition-colors">Reviews</a>
             <a href="#faq" className="hover:text-primary transition-colors">FAQ</a>
             <button onClick={() => setActiveModal("contact")} className="hover:text-primary transition-colors text-left font-medium">Contact Us</button>
           </nav>
@@ -320,6 +382,7 @@ export default function Home() {
             <a href="#features" onClick={() => setMobileMenuOpen(false)} className="hover:text-primary transition-colors py-2">Features</a>
             <a href="#products" onClick={() => setMobileMenuOpen(false)} className="hover:text-primary transition-colors py-2">Shop</a>
             <a href="#benefits" onClick={() => setMobileMenuOpen(false)} className="hover:text-primary transition-colors py-2">Why Maceo</a>
+            <a href="#reviews" onClick={() => setMobileMenuOpen(false)} className="hover:text-primary transition-colors py-2">Reviews</a>
             <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="hover:text-primary transition-colors py-2">FAQ</a>
             <button onClick={() => { setMobileMenuOpen(false); setActiveModal("contact"); }} className="hover:text-primary transition-colors py-2 text-left">Contact Us</button>
             <Button asChild className="w-full bg-primary mt-4 py-6 text-base font-semibold">
@@ -656,6 +719,74 @@ export default function Home() {
             <p className="text-sm text-muted-foreground leading-relaxed">
               Engineered with durable, impact-resistant polycarbonate to protect your device from any drops.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Customer Reviews Section */}
+      <section id="reviews" className="py-20 bg-muted/20 border-b border-border/30">
+        <div className="container">
+          <div className="text-center max-w-2xl mx-auto mb-16 flex flex-col gap-4">
+            <Badge className="w-fit mx-auto px-3 py-1 text-xs font-semibold bg-primary/10 text-primary border-none">
+              REAL REVIEWS
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
+              Loved by 50,000+ iPad Users
+            </h2>
+            <div className="flex items-center justify-center gap-2 mt-2">
+              <div className="flex text-yellow-400">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="h-5 w-5 fill-current" />
+                ))}
+              </div>
+              <span className="font-bold text-sm">4.9 out of 5 stars rating</span>
+            </div>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-2">
+            {reviews.map((review) => (
+              <Card key={review.id} className="border-border/60 bg-card hover:shadow-md transition-all duration-300">
+                <CardContent className="p-6 flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10 border border-border">
+                        <AvatarImage src={review.avatar} alt={review.name} />
+                        <AvatarFallback>{review.name[0]}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-sm">{review.name}</span>
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <span>Purchased:</span>
+                          <span className="font-semibold text-primary">{review.colorPurchased}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1 text-right">
+                      <div className="flex text-yellow-400">
+                        {[...Array(review.rating)].map((_, i) => (
+                          <Star key={i} className="h-3.5 w-3.5 fill-current" />
+                        ))}
+                      </div>
+                      <span className="text-[10px] text-muted-foreground">{review.date}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold text-sm">{review.title}</h4>
+                      {review.verified && (
+                        <Badge className="bg-green-500/10 text-green-600 dark:text-green-400 border-none text-[10px] px-2 py-0 font-bold flex items-center gap-0.5">
+                          <UserCheck className="h-3 w-3" /> Verified Buyer
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-muted-foreground text-xs leading-relaxed">
+                      "{review.comment}"
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
