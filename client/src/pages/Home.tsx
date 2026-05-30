@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { 
   Check, 
@@ -671,15 +672,24 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Floating Buy Now Button */}
+      {/* Floating Buy Now Button with Tooltip */}
       {showFloatingBtn && (
         <div className="fixed bottom-6 right-6 z-40 animate-in slide-in-from-bottom-10 duration-300">
-          <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold px-6 py-6 rounded-full shadow-2xl shadow-primary/40 flex items-center gap-2 border border-white/20 hover:scale-105 active:scale-95 transition-all">
-            <a href={PURCHASE_LINK} target="_blank" rel="noopener noreferrer">
-              <ShoppingCart className="h-5 w-5" />
-              <span>Buy Now - 50% OFF</span>
-            </a>
-          </Button>
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold px-6 py-6 rounded-full shadow-2xl shadow-primary/40 flex items-center gap-2 border border-white/20 hover:scale-105 active:scale-95 transition-all">
+                  <a href={PURCHASE_LINK} target="_blank" rel="noopener noreferrer">
+                    <ShoppingCart className="h-5 w-5" />
+                    <span>Buy Now - 50% OFF</span>
+                  </a>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top" align="center" className="bg-red-500 text-white border-none font-bold text-xs px-3 py-1.5 rounded-lg shadow-lg mb-2">
+                Limited Offer
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       )}
 
