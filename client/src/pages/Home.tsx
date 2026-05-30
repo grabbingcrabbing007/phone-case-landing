@@ -1197,7 +1197,7 @@ export default function Home() {
                     <div className="space-y-2">
                       <Label htmlFor="checkout-color" className="text-xs font-semibold text-muted-foreground">Select Color</Label>
                       <Select value={checkoutColor} onValueChange={setCheckoutColor}>
-                        <SelectTrigger id="checkout-color" className="rounded-xl bg-background border-border/80 text-xs h-12 focus:ring-primary w-full">
+                        <SelectTrigger id="checkout-color" className="rounded-xl bg-background border-border/80 text-xs !h-12 px-3 focus:ring-primary w-full">
                           <SelectValue placeholder="Select Color" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1213,7 +1213,7 @@ export default function Home() {
                     <div className="space-y-2">
                       <Label htmlFor="checkout-model" className="text-xs font-semibold text-muted-foreground">iPad Model</Label>
                       <Select value={checkoutModel} onValueChange={setCheckoutModel}>
-                        <SelectTrigger id="checkout-model" className="rounded-xl bg-background border-border/80 text-xs h-12 focus:ring-primary w-full">
+                        <SelectTrigger id="checkout-model" className="rounded-xl bg-background border-border/80 text-xs !h-12 px-3 focus:ring-primary w-full">
                           <SelectValue placeholder="Select iPad Model" />
                         </SelectTrigger>
                         <SelectContent>
@@ -1287,7 +1287,7 @@ export default function Home() {
                       />
                     </div>
 
-                    <div className="grid gap-4 grid-cols-3">
+                    <div className="grid gap-4 grid-cols-3 items-end">
                       <div className="space-y-2 col-span-1">
                         <Label htmlFor="shipping-city" className="text-xs font-semibold text-muted-foreground">City</Label>
                         <Input 
@@ -1313,8 +1313,8 @@ export default function Home() {
                       <div className="space-y-2 col-span-1">
                         <Label htmlFor="shipping-country" className="text-xs font-semibold text-muted-foreground">Country</Label>
                         <Select value={shippingCountry} onValueChange={setShippingCountry}>
-                          <SelectTrigger id="shipping-country" className="rounded-xl bg-background border-border/80 text-xs h-12 focus:ring-primary w-full">
-                            <SelectValue placeholder="Select Country" />
+                          <SelectTrigger id="shipping-country" className="rounded-xl bg-background border-border/80 text-xs !h-12 px-3 focus:ring-primary w-full flex items-center justify-between">
+                            <SelectValue placeholder="Country" />
                           </SelectTrigger>
                           <SelectContent>
                             {countriesList.map((c) => (
