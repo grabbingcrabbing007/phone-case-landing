@@ -141,6 +141,10 @@ export default function Home() {
   // Ref for the video container/section to observe visibility
   const reviewsSectionRef = useRef<HTMLDivElement>(null);
   
+  // Touch coordinates for swipe support
+  const touchStartX = useRef<number | null>(null);
+  const touchEndX = useRef<number | null>(null);
+  
   // Instagram Reels Data (HD CDN Links)
   const instagramReels = [
     {
@@ -574,6 +578,34 @@ export default function Home() {
     setCurrentReelIndex((prev) => (prev - 1 + instagramReels.length) % instagramReels.length);
   };
 
+  // Touch handlers for swipe support on the video carousel
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartX.current || !touchEndX.current) return;
+    
+    const difference = touchStartX.current - touchEndX.current;
+    const minSwipeDistance = 50; // Minimum distance in pixels to trigger a swipe
+
+    if (difference > minSwipeDistance) {
+      // Swiped left -> next video
+      nextReel();
+    } else if (difference < -minSwipeDistance) {
+      // Swiped right -> previous video
+      prevReel();
+    }
+
+    // Reset touch coordinates
+    touchStartX.current = null;
+    touchEndX.current = null;
+  };
+
   const currentProduct = products[selectedColor];
   const checkoutProduct = products[checkoutColor];
 
@@ -990,7 +1022,12 @@ export default function Home() {
             </div>
             
             {/* Carousel Container */}
-            <div className="relative rounded-3xl overflow-hidden border border-border/80 shadow-2xl bg-black aspect-[9/16] max-h-[650px] mx-auto group">
+            <div 
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className="relative rounded-3xl overflow-hidden border border-border/80 shadow-2xl bg-black aspect-[9/16] max-h-[650px] mx-auto group"
+            >
               {instagramReels.map((reel, index) => (
                 <div 
                   key={reel.id} 
