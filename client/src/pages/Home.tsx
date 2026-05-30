@@ -141,6 +141,10 @@ export default function Home() {
   // Ref for the video container/section to observe visibility
   const reviewsSectionRef = useRef<HTMLDivElement>(null);
   
+  // Ref for the first showcase video section
+  const showcaseSectionRef = useRef<HTMLDivElement>(null);
+  const showcaseVideoRef = useRef<HTMLVideoElement>(null);
+  
   // Touch coordinates for swipe support
   const touchStartX = useRef<number | null>(null);
   const touchEndX = useRef<number | null>(null);
@@ -255,6 +259,44 @@ export default function Home() {
       }
     };
   }, [currentReelIndex]);
+
+  // Intersection Observer for the first showcase video (autoplay, muted, loop)
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: "0px",
+      threshold: 0.3,
+    };
+
+    const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        const videoElement = showcaseVideoRef.current;
+        if (videoElement) {
+          if (entry.isIntersecting) {
+            videoElement.play()
+              .catch((err) => {
+                console.log("Showcase video autoplay failed:", err);
+              });
+          } else {
+            videoElement.pause();
+          }
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(handleIntersection, observerOptions);
+    const target = showcaseSectionRef.current;
+
+    if (target) {
+      observer.observe(target);
+    }
+
+    return () => {
+      if (target) {
+        observer.unobserve(target);
+      }
+    };
+  }, []);
 
   const acceptCookies = () => {
     localStorage.setItem("cookie_accepted", "true");
@@ -728,7 +770,7 @@ export default function Home() {
       </section>
 
       {/* Video Showcase Section */}
-      <section className="py-20 bg-muted/20 border-y border-border/30">
+      <section ref={showcaseSectionRef} className="py-20 bg-muted/20 border-y border-border/30">
         <div className="container max-w-4xl text-center">
           <div className="mb-12 flex flex-col gap-4">
             <Badge className="w-fit mx-auto px-3 py-1 text-xs font-semibold bg-primary/10 text-primary border-none">
@@ -743,8 +785,12 @@ export default function Home() {
           </div>
           <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl bg-black aspect-video">
             <video 
+              ref={showcaseVideoRef}
               src="/manus-storage/orig_video_52cb8baf.mp4" 
               controls 
+              muted
+              loop
+              playsInline
               className="w-full h-full object-cover"
               poster="/manus-storage/orig_hero_9ef6b916.webp"
             />
