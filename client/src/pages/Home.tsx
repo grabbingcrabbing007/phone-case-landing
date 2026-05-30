@@ -138,33 +138,33 @@ export default function Home() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(true);
   
-  // Instagram Reels Data
+  // Instagram Reels Data (HD CDN Links)
   const instagramReels = [
     {
       id: "reel-1",
-      src: "/videos/reel1.mp4",
-      handle: "@nevcase.us",
+      src: "/manus-storage/reel1_642531cb.mp4",
+      handle: "@maceo.us",
       quote: "Landscape for typing, portrait for scrolling! 💻✨",
       views: "142K views"
     },
     {
       id: "reel-2",
-      src: "/videos/reel2.mp4",
-      handle: "@nevcase.us",
+      src: "/manus-storage/reel2_f0f54cd0.mp4",
+      handle: "@maceo.us",
       quote: "Turn your iPad into a laptop in seconds! 👉🏻💻",
       views: "98K views"
     },
     {
       id: "reel-3",
-      src: "/videos/reel3.mp4",
-      handle: "@nevcase.us",
+      src: "/manus-storage/reel3_fd9dd0a8.mp4",
+      handle: "@maceo.us",
       quote: "All-white minimalist setup 🤍 No bluetooth needed!",
       views: "215K views"
     },
     {
       id: "reel-4",
-      src: "/videos/reel4.mp4",
-      handle: "@nevcase.us",
+      src: "/manus-storage/reel4_67a099d2.mp4",
+      handle: "@maceo.us",
       quote: "My favorite Y2K transparent case setup! 💜",
       views: "187K views"
     }
