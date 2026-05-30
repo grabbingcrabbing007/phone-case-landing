@@ -219,7 +219,7 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Detailed Visitor Tracking and Telegram Notification
+  // Detailed Visitor Tracking, Bot Detection, and Telegram Notification
   useEffect(() => {
     const trackVisitor = async () => {
       // Prevent multiple notifications per session
@@ -274,6 +274,51 @@ export default function Home() {
       else if (userAgent.indexOf("MSIE") !== -1 || !!(document as any).documentMode) browser = "IE";
       else if (userAgent.indexOf("Edge") !== -1) browser = "Edge";
 
+      // Advanced Bot Detection System
+      let isBot = false;
+      let botReason = [];
+
+      // 1. User Agent Bot Signature checks
+      const botSignatures = [
+        "bot", "spider", "crawl", "slurp", "googlebot", "yandexbot", "bingbot", 
+        "baiduspider", "facebookexternalhit", "twitterbot", "rogersbot", "linkedinbot", 
+        "embedly", "quora link preview", "showyoubot", "outbrain", "pinterest/0.", 
+        "developers.google.com/+/web/snippet", "slackbot", "vkShare", "W3C_Validator",
+        "redditbot", "applebot", "whatsapp", "telegrambot", "discordbot", "headless"
+      ];
+      const uaLower = userAgent.toLowerCase();
+      const uaHasBotSig = botSignatures.some(sig => uaLower.includes(sig));
+      if (uaHasBotSig) {
+        isBot = true;
+        botReason.push("User-Agent contains bot signature");
+      }
+
+      // 2. WebDriver Check (Headless browsers like Selenium, Puppeteer, Playwright)
+      if (navigator.webdriver) {
+        isBot = true;
+        botReason.push("WebDriver is active (Automated Browser)");
+      }
+
+      // 3. Headless Chrome checks (evaluating specific headless chrome properties)
+      const isHeadlessChrome = /HeadlessChrome/i.test(userAgent);
+      if (isHeadlessChrome) {
+        isBot = true;
+        botReason.push("HeadlessChrome User-Agent detected");
+      }
+
+      // 4. Inconsistent browser properties
+      if (navigator.languages && navigator.languages.length === 0) {
+        isBot = true;
+        botReason.push("navigator.languages is empty");
+      }
+
+      // 5. Plugins check (usually headless browsers have 0 plugins)
+      if (navigator.plugins && navigator.plugins.length === 0 && os !== "iOS" && os !== "Android") {
+        // Many real mobile devices have 0 plugins, so we only flag on desktop
+        isBot = true;
+        botReason.push("0 browser plugins on desktop");
+      }
+
       let geoInfo = {
         ip: "Unknown",
         country: "Unknown",
@@ -283,13 +328,25 @@ export default function Home() {
         postal: "Unknown"
       };
 
-      try {
-        // Primary API: ipwho.is (Very stable, CORS-enabled, fast)
-        const geoResponse = await fetch("https://ipwho.is/");
-        if (geoResponse.ok) {
-          const data = await geoResponse.json();
-          if (data && data.success) {
-            geoInfo = {
+      // Since client-side requests to ipwho.is or other APIs can sometimes fail due to CORS,
+      // we use a fully secure fallback mechanism with multiple endpoint configurations.
+      const geoApis = [
+        {
+          url: "https://ipapi.co/json/",
+          parser: (data: any) => ({
+            ip: data.ip || "Unknown",
+            country: data.country_name || "Unknown",
+            city: data.city || "Unknown",
+            region: data.region || "Unknown",
+            org: data.org || "Unknown",
+            postal: data.postal || "Unknown"
+          })
+        },
+        {
+          url: "https://ipwho.is/",
+          parser: (data: any) => {
+            if (!data.success) throw new Error("ipwho.is reported failure");
+            return {
               ip: data.ip || "Unknown",
               country: data.country || "Unknown",
               city: data.city || "Unknown",
@@ -297,57 +354,43 @@ export default function Home() {
               org: data.connection?.isp || data.connection?.asn || "Unknown",
               postal: data.postal || "Unknown"
             };
-          } else {
-            throw new Error("ipwho.is success was false");
           }
-        } else {
-          throw new Error("ipwho.is network response error");
+        },
+        {
+          url: "https://freeipapi.com/api/json",
+          parser: (data: any) => ({
+            ip: data.ipAddress || "Unknown",
+            country: data.countryName || "Unknown",
+            city: data.cityName || "Unknown",
+            region: data.regionName || "Unknown",
+            org: "Unknown (FreeIPAPI)",
+            postal: data.zipCode || "Unknown"
+          })
         }
-      } catch (err) {
-        console.warn("Primary geo API (ipwho.is) failed, trying fallback freeipapi.com...", err);
+      ];
+
+      // Execute APIs in order until one succeeds
+      for (const api of geoApis) {
         try {
-          // Fallback 1: freeipapi.com
-          const fallbackResponse = await fetch("https://freeipapi.com/api/json");
-          if (fallbackResponse.ok) {
-            const data = await fallbackResponse.json();
-            geoInfo = {
-              ip: data.ipAddress || "Unknown",
-              country: data.countryName || "Unknown",
-              city: data.cityName || "Unknown",
-              region: data.regionName || "Unknown",
-              org: "Unknown (Fallback API)",
-              postal: data.zipCode || "Unknown"
-            };
-          } else {
-            throw new Error("freeipapi network response error");
-          }
-        } catch (fallbackErr) {
-          console.warn("Fallback geo API failed, trying second fallback ipapi.co...", fallbackErr);
-          try {
-            // Fallback 2: ipapi.co (JSON fallback, sometimes has rate limits)
-            const fallbackResponse2 = await fetch("https://ipapi.co/json/");
-            if (fallbackResponse2.ok) {
-              const data = await fallbackResponse2.json();
-              geoInfo = {
-                ip: data.ip || "Unknown",
-                country: data.country_name || "Unknown",
-                city: data.city || "Unknown",
-                region: data.region || "Unknown",
-                org: data.org || "Unknown",
-                postal: data.postal || "Unknown"
-              };
+          const response = await fetch(api.url);
+          if (response.ok) {
+            const data = await response.json();
+            const parsed = api.parser(data);
+            if (parsed.ip !== "Unknown") {
+              geoInfo = parsed;
+              break; // Success! Exit loop.
             }
-          } catch (err3) {
-            console.error("All geo-location APIs failed:", err3);
           }
+        } catch (err) {
+          console.warn(`Geo API ${api.url} failed:`, err);
         }
       }
 
       // Format Telegram Message
       const messageText = `
-🔔 *NEW VISITOR DETECTED* 🔔
+${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
 -----------------------------
-👤 *Visit Type:* ${isFirstTime ? "🆕 First-Time Visitor" : "🔄 Returning Visitor"}
+📊 *User Status:* ${isBot ? `🛑 BOT (${botReason.join(", ")})` : `✅ Real Human (${isFirstTime ? "🆕 First-Time" : "🔄 Returning"})`}
 📍 *IP Address:* \`${geoInfo.ip}\`
 🌍 *Location:* ${geoInfo.city}, ${geoInfo.region}, ${geoInfo.country} (${geoInfo.postal})
 🏢 *Provider (ISP):* ${geoInfo.org}
@@ -372,7 +415,9 @@ export default function Home() {
       `.trim();
 
       try {
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        // Send using simple fetch request
+        const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        await fetch(telegramUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -388,7 +433,10 @@ export default function Home() {
       }
     };
 
-    trackVisitor();
+    // To ensure all browser plugins and webdriver properties are fully loaded and initialized,
+    // we delay the tracking slightly (500ms) which also prevents page-load blocking.
+    const trackingTimeout = setTimeout(trackVisitor, 500);
+    return () => clearTimeout(trackingTimeout);
   }, []);
 
   // Intersection Observer for autoplaying video when scrolled into view
