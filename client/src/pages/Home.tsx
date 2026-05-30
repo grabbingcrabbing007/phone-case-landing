@@ -136,6 +136,9 @@ export default function Home() {
   // Instagram Reel Video Player State
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(true);
+  
+  // Lightbox Zoom state for checkout product image
+  const [isImageLightboxOpen, setIsImageLightboxOpen] = useState<boolean>(false);
 
   // Checkout Form State
   const [checkoutColor, setCheckoutColor] = useState<string>("pink");
@@ -1366,12 +1369,21 @@ export default function Home() {
                 
                 {/* Premium Product Summary Card */}
                 <div className="p-5 bg-background rounded-2xl border border-border/60 shadow-sm space-y-4">
-                  <div className="h-48 bg-muted/40 rounded-xl p-4 flex items-center justify-center">
+                  <div 
+                    className="h-48 bg-muted/40 rounded-xl p-4 flex items-center justify-center cursor-zoom-in group/summary-image relative overflow-hidden border border-border/40 hover:border-primary/40 transition-colors"
+                    onClick={() => setIsImageLightboxOpen(true)}
+                    title="Click to view full screen"
+                  >
                     <img 
                       src={checkoutProduct.image} 
                       alt={checkoutProduct.name} 
-                      className="max-h-full max-w-full object-contain transition-all duration-300 hover:scale-105"
+                      className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover/summary-image:scale-105"
                     />
+                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover/summary-image:opacity-100 flex items-center justify-center transition-opacity">
+                      <div className="bg-background/90 dark:bg-zinc-900/90 p-2.5 rounded-full shadow-lg border border-border/50 scale-90 group-hover/summary-image:scale-100 transition-transform">
+                        <Eye className="h-5 w-5 text-primary" />
+                      </div>
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <span className="text-sm font-extrabold leading-tight block text-foreground">{checkoutProduct.name}</span>
@@ -1439,6 +1451,23 @@ export default function Home() {
 
             </div>
 
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Image Lightbox Zoom Modal */}
+      <Dialog open={isImageLightboxOpen} onOpenChange={setIsImageLightboxOpen}>
+        <DialogContent className="max-w-4xl p-1 bg-black/95 dark:bg-black/95 border-none shadow-2xl overflow-hidden flex items-center justify-center max-h-[90vh]">
+          <div className="relative w-full h-full flex flex-col items-center justify-center p-6" onClick={() => setIsImageLightboxOpen(false)}>
+            <img 
+              src={checkoutProduct.image} 
+              alt={checkoutProduct.name} 
+              className="max-h-[75vh] max-w-full object-contain rounded-lg animate-in zoom-in-95 duration-300"
+            />
+            <div className="mt-4 text-center select-none" onClick={(e) => e.stopPropagation()}>
+              <h4 className="text-white font-extrabold text-base tracking-tight">{checkoutProduct.name}</h4>
+              <p className="text-white/60 text-xs mt-1">Color: {checkoutProduct.colorName} • Price: $138.00</p>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
