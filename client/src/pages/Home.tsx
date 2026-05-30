@@ -40,11 +40,14 @@ import {
   Play,
   Pause,
   Volume2,
-  VolumeX
+  VolumeX,
+  CreditCard,
+  Lock
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
-const PURCHASE_LINK = "https://jim.com/a/jim_maceo-j-jr-jr-loving";
+// Updated final checkout URL
+const FINAL_PAYMENT_URL = "https://pay.jim.com/jim_maceo-j-jr-jr-loving/Ri1D-YjA0YipxJJ-138.00";
 
 interface Product {
   id: string;
@@ -84,7 +87,7 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [showFloatingBtn, setShowFloatingBtn] = useState<boolean>(false);
   
-  // Modal states for policies and contact
+  // Modal states for policies, contact, and checkout
   const [activeModal, setActiveModal] = useState<string | null>(null);
 
   // Contact form state
@@ -107,6 +110,18 @@ export default function Home() {
   // Instagram Reel Video Player State
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(true);
+
+  // Checkout Form State
+  const [checkoutColor, setCheckoutColor] = useState<string>("pink");
+  const [checkoutModel, setCheckoutModel] = useState<string>("");
+  const [shippingName, setShippingName] = useState<string>("");
+  const [shippingEmail, setShippingEmail] = useState<string>("");
+  const [shippingPhone, setShippingPhone] = useState<string>("");
+  const [shippingAddress, setShippingAddress] = useState<string>("");
+  const [shippingCity, setShippingCity] = useState<string>("");
+  const [shippingZip, setShippingAddressZip] = useState<string>("");
+  const [shippingCountry, setShippingCountry] = useState<string>("");
+  const [checkoutSubmitting, setCheckoutSubmitting] = useState<boolean>(false);
 
   // Load cookie preference and scroll listener
   useEffect(() => {
@@ -160,6 +175,33 @@ export default function Home() {
     setNewsletterEmail("");
   };
 
+  // Open Checkout Modal with pre-selected color and model
+  const openCheckout = () => {
+    setCheckoutColor(selectedColor);
+    setCheckoutModel(selectedModel);
+    setActiveModal("checkout");
+  };
+
+  // Handle Checkout Form Submission (redirect to pay.jim.com)
+  const handleCheckoutSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!shippingName || !shippingEmail || !shippingPhone || !shippingAddress || !shippingCity || !shippingZip || !shippingCountry) {
+      toast.error("Please complete all shipping details.");
+      return;
+    }
+    if (!checkoutModel) {
+      toast.error("Please select your iPad model.");
+      return;
+    }
+
+    setCheckoutSubmitting(true);
+    toast.success("Shipping details saved! Redirecting to secure payment page...");
+    
+    setTimeout(() => {
+      window.location.href = FINAL_PAYMENT_URL;
+    }, 1500);
+  };
+
   // iPad compatibility database
   const ipadModels: iPadModel[] = [
     { id: "pro-11-m4", name: "iPad Pro 11-inch (M4, 2024)", numbers: ["A2836", "A2837", "A3006"], compatible: true },
@@ -200,7 +242,7 @@ export default function Home() {
     pink: {
       id: "pink",
       name: "Maceo Y2K Transparent Pink 360° Rotating Case",
-      price: "$139.00",
+      price: "$138.00",
       originalPrice: "$278.00",
       badge: "-50% OFF",
       image: "/manus-storage/orig_pink_83fad1aa.webp",
@@ -217,7 +259,7 @@ export default function Home() {
     purple: {
       id: "purple",
       name: "Maceo Y2K Transparent Purple 360° Rotating Case",
-      price: "$139.00",
+      price: "$138.00",
       originalPrice: "$278.00",
       badge: "-50% OFF",
       image: "/manus-storage/orig_purple_d4f41d87.webp",
@@ -234,7 +276,7 @@ export default function Home() {
     blue: {
       id: "blue",
       name: "Maceo Y2K Transparent Blue 360° Rotating Case",
-      price: "$139.00",
+      price: "$138.00",
       originalPrice: "$278.00",
       badge: "-50% OFF",
       image: "/manus-storage/orig_blue_1f9a69c7.webp",
@@ -251,7 +293,7 @@ export default function Home() {
     black: {
       id: "black",
       name: "Maceo Premium Transparent Black 360° Rotating Case",
-      price: "$139.00",
+      price: "$138.00",
       originalPrice: "$278.00",
       badge: "-50% OFF",
       image: "/manus-storage/orig_black_f6dd41bf.webp",
@@ -268,7 +310,7 @@ export default function Home() {
     white: {
       id: "white",
       name: "Maceo Y2K Transparent White 360° Rotating Case",
-      price: "$139.00",
+      price: "$138.00",
       originalPrice: "$278.00",
       badge: "-50% OFF",
       image: "/manus-storage/orig_white_552f149a.webp",
@@ -353,6 +395,7 @@ export default function Home() {
   };
 
   const currentProduct = products[selectedColor];
+  const checkoutProduct = products[checkoutColor];
 
   return (
     <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
@@ -389,18 +432,9 @@ export default function Home() {
             >
               {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
-            <Button asChild size="sm" className="hidden md:inline-flex bg-primary hover:bg-primary/90 font-semibold shadow-lg shadow-primary/20">
-              <a href={PURCHASE_LINK} target="_blank" rel="noopener noreferrer">
-                Buy Now
-              </a>
+            <Button onClick={openCheckout} size="sm" className="hidden md:inline-flex bg-primary hover:bg-primary/90 font-semibold shadow-lg shadow-primary/20">
+              Buy Now
             </Button>
-            <button 
-              className="md:hidden p-2" 
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
           </div>
         </div>
       </header>
@@ -415,10 +449,8 @@ export default function Home() {
             <a href="#reviews" onClick={() => setMobileMenuOpen(false)} className="hover:text-primary transition-colors py-2">Reviews</a>
             <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="hover:text-primary transition-colors py-2">FAQ</a>
             <button onClick={() => { setMobileMenuOpen(false); setActiveModal("contact"); }} className="hover:text-primary transition-colors py-2 text-left">Contact Us</button>
-            <Button asChild className="w-full bg-primary mt-4 py-6 text-base font-semibold">
-              <a href={PURCHASE_LINK} target="_blank" rel="noopener noreferrer">
-                Buy Now - 50% OFF
-              </a>
+            <Button onClick={() => { setMobileMenuOpen(false); openCheckout(); }} className="w-full bg-primary mt-4 py-6 text-base font-semibold">
+              Buy Now - 50% OFF
             </Button>
           </nav>
         </div>
@@ -441,10 +473,8 @@ export default function Home() {
               Meet the Maceo 360° Rotating Transparent iPad Case. Transform your tablet into a fully versatile workstation instantly. Rotate, type, draw, and protect with style.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 py-6 rounded-full shadow-xl shadow-primary/25 text-base transition-all hover:scale-105 active:scale-95">
-                <a href={PURCHASE_LINK} target="_blank" rel="noopener noreferrer">
-                  Claim 50% Off Now
-                </a>
+              <Button onClick={openCheckout} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 py-6 rounded-full shadow-xl shadow-primary/25 text-base transition-all hover:scale-105 active:scale-95">
+                Claim 50% Off Now
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-full border-border/80 hover:bg-muted font-semibold px-8 py-6 text-base">
                 <a href="#products">Explore Colors</a>
@@ -695,10 +725,8 @@ export default function Home() {
 
               {/* Main CTA Button */}
               <div className="flex flex-col gap-3 pt-4 border-t border-border/60">
-                <Button asChild size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold py-7 rounded-full shadow-xl shadow-primary/30 text-lg transition-all hover:scale-[1.02] active:scale-98">
-                  <a href={PURCHASE_LINK} target="_blank" rel="noopener noreferrer">
-                    BUY NOW - SECURE LINK <ChevronRight className="ml-2 h-5 w-5" />
-                  </a>
+                <Button onClick={openCheckout} size="lg" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold py-7 rounded-full shadow-xl shadow-primary/30 text-lg transition-all hover:scale-[1.02] active:scale-98">
+                  BUY NOW - SECURE LINK <ChevronRight className="ml-2 h-5 w-5" />
                 </Button>
                 <div className="flex justify-center gap-6 text-xs text-muted-foreground font-medium">
                   <span className="flex items-center gap-1">
@@ -1024,11 +1052,9 @@ export default function Home() {
                 <div className="relative group">
                   {/* Pulse wave background ring */}
                   <div className="absolute inset-0 rounded-full bg-primary/40 animate-ping opacity-75 pointer-events-none" style={{ animationDuration: '2.5s' }} />
-                  <Button asChild size="lg" className="relative bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold px-6 py-6 rounded-full shadow-2xl shadow-primary/40 flex items-center gap-2 border border-white/20 hover:scale-105 active:scale-95 transition-all">
-                    <a href={PURCHASE_LINK} target="_blank" rel="noopener noreferrer">
-                      <ShoppingCart className="h-5 w-5" />
-                      <span>Buy Now - 50% OFF</span>
-                    </a>
+                  <Button onClick={openCheckout} size="lg" className="relative bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold px-6 py-6 rounded-full shadow-2xl shadow-primary/40 flex items-center gap-2 border border-white/20 hover:scale-105 active:scale-95 transition-all">
+                    <ShoppingCart className="h-5 w-5" />
+                    <span>Buy Now - 50% OFF</span>
                   </Button>
                 </div>
               </TooltipTrigger>
@@ -1066,6 +1092,248 @@ export default function Home() {
       {/* ======================================================== */}
       {/* MODALS / DIALOGS FOR FUNCTIONAL LINKS */}
       {/* ======================================================== */}
+
+      {/* Checkout Modal / Flow */}
+      <Dialog open={activeModal === "checkout"} onOpenChange={(open) => !open && setActiveModal(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 rounded-2xl">
+          <div className="grid md:grid-cols-12">
+            
+            {/* Left Column: Checkout Form */}
+            <div className="md:col-span-7 p-6 sm:p-8 space-y-6">
+              <div className="flex flex-col gap-1.5">
+                <DialogTitle className="font-display text-2xl font-bold tracking-tight">Checkout Details</DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground">Complete your shipping information to proceed to secure payment.</DialogDescription>
+              </div>
+
+              <form onSubmit={handleCheckoutSubmit} className="space-y-4">
+                
+                {/* 1. Design & Model Selection */}
+                <div className="space-y-3">
+                  <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase">1. Customize Your Order</span>
+                  
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="checkout-color" className="text-xs">Color / Design</Label>
+                      <Select value={checkoutColor} onValueChange={setCheckoutColor}>
+                        <SelectTrigger id="checkout-color" className="rounded-xl bg-background border-border/80 text-xs h-11">
+                          <SelectValue placeholder="Select Color" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.values(products).map((p) => (
+                            <SelectItem key={p.id} value={p.id} className="text-xs">
+                              {p.colorName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="checkout-model" className="text-xs">iPad Model Compatibility</Label>
+                      <Select value={checkoutModel} onValueChange={setCheckoutModel}>
+                        <SelectTrigger id="checkout-model" className="rounded-xl bg-background border-border/80 text-xs h-11">
+                          <SelectValue placeholder="Select iPad Model" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {ipadModels.filter(m => m.compatible).map((m) => (
+                            <SelectItem key={m.id} value={m.id} className="text-xs">
+                              {m.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Shipping Info */}
+                <div className="space-y-3 pt-2 border-t border-border/40">
+                  <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase">2. Shipping Address</span>
+                  
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="shipping-name" className="text-xs">Full Name</Label>
+                      <Input 
+                        id="shipping-name" 
+                        placeholder="John Doe" 
+                        value={shippingName} 
+                        onChange={(e) => setShippingName(e.target.value)}
+                        className="rounded-xl h-11 text-xs border-border/80"
+                        required
+                      />
+                    </div>
+
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="space-y-1.5">
+                        <Label htmlFor="shipping-email" className="text-xs">Email Address</Label>
+                        <Input 
+                          id="shipping-email" 
+                          type="email" 
+                          placeholder="john@example.com" 
+                          value={shippingEmail} 
+                          onChange={(e) => setShippingEmail(e.target.value)}
+                          className="rounded-xl h-11 text-xs border-border/80"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label htmlFor="shipping-phone" className="text-xs">Phone Number</Label>
+                        <Input 
+                          id="shipping-phone" 
+                          type="tel" 
+                          placeholder="+1 (555) 000-0000" 
+                          value={shippingPhone} 
+                          onChange={(e) => setShippingPhone(e.target.value)}
+                          className="rounded-xl h-11 text-xs border-border/80"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="shipping-address" className="text-xs">Street Address</Label>
+                      <Input 
+                        id="shipping-address" 
+                        placeholder="123 Tech Avenue, Apt 4B" 
+                        value={shippingAddress} 
+                        onChange={(e) => setShippingAddress(e.target.value)}
+                        className="rounded-xl h-11 text-xs border-border/80"
+                        required
+                      />
+                    </div>
+
+                    <div className="grid gap-3 grid-cols-3">
+                      <div className="space-y-1.5 col-span-1">
+                        <Label htmlFor="shipping-city" className="text-xs">City</Label>
+                        <Input 
+                          id="shipping-city" 
+                          placeholder="New York" 
+                          value={shippingCity} 
+                          onChange={(e) => setShippingCity(e.target.value)}
+                          className="rounded-xl h-11 text-xs border-border/80"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1.5 col-span-1">
+                        <Label htmlFor="shipping-zip" className="text-xs">ZIP Code</Label>
+                        <Input 
+                          id="shipping-zip" 
+                          placeholder="10001" 
+                          value={shippingZip} 
+                          onChange={(e) => setShippingAddressZip(e.target.value)}
+                          className="rounded-xl h-11 text-xs border-border/80"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1.5 col-span-1">
+                        <Label htmlFor="shipping-country" className="text-xs">Country</Label>
+                        <Input 
+                          id="shipping-country" 
+                          placeholder="United States" 
+                          value={shippingCountry} 
+                          onChange={(e) => setShippingCountry(e.target.value)}
+                          className="rounded-xl h-11 text-xs border-border/80"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Submit & Secure Payment Button */}
+                <div className="pt-4 space-y-3">
+                  <Button 
+                    type="submit" 
+                    disabled={checkoutSubmitting} 
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold py-6 rounded-xl shadow-lg text-sm"
+                  >
+                    {checkoutSubmitting ? "Saving Details..." : "Proceed to Secure Payment"}
+                  </Button>
+                  
+                  {/* Payment Badges Info */}
+                  <div className="flex flex-col items-center gap-1 text-center">
+                    <span className="text-[10px] text-muted-foreground flex items-center justify-center gap-1 font-semibold">
+                      <Lock className="h-3 w-3 text-green-500" /> SECURE 256-BIT SSL CHECKOUT
+                    </span>
+                    <p className="text-[9px] text-muted-foreground leading-normal max-w-[280px]">
+                      We support all major Credit Cards, Apple Pay, and Google Pay. Payments are processed securely via encrypted gateway.
+                    </p>
+                  </div>
+                </div>
+
+              </form>
+            </div>
+
+            {/* Right Column: Order Summary (Sticky/Visual Column) */}
+            <div className="md:col-span-5 bg-muted/30 p-6 sm:p-8 border-t md:border-t-0 md:border-l border-border/40 flex flex-col justify-between">
+              <div className="space-y-6">
+                <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase">Order Summary</span>
+                
+                {/* Product Preview card */}
+                <div className="flex items-center gap-4 p-3 bg-background rounded-xl border border-border/40">
+                  <div className="h-16 w-16 bg-muted/40 rounded-lg p-2 flex items-center justify-center shrink-0">
+                    <img 
+                      src={checkoutProduct.image} 
+                      alt={checkoutProduct.name} 
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1 min-w-0">
+                    <span className="text-xs font-bold truncate leading-tight">{checkoutProduct.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-primary font-extrabold">$138.00</span>
+                      <span className="text-[10px] text-muted-foreground line-through">$278.00</span>
+                    </div>
+                    <Badge className="w-fit bg-primary/10 text-primary border-none text-[9px] px-1.5 py-0 font-bold">
+                      {checkoutProduct.colorName}
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Price Breakdown */}
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Subtotal</span>
+                    <span className="font-semibold">$138.00</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Shipping</span>
+                    <span className="font-semibold text-green-500">FREE</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Tax</span>
+                    <span className="font-semibold">$0.00</span>
+                  </div>
+                  <div className="pt-2 border-t border-border/40 flex justify-between text-sm font-bold">
+                    <span>Total Amount</span>
+                    <span className="text-primary text-base font-extrabold">$138.00</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Guarantees list */}
+              <div className="mt-8 pt-6 border-t border-border/40 space-y-3">
+                <div className="flex items-start gap-2.5 text-[10px] text-muted-foreground leading-normal">
+                  <Truck className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold block text-foreground">Free Worldwide Shipping</span>
+                    Tracking details will be emailed immediately after shipping.
+                  </div>
+                </div>
+                <div className="flex items-start gap-2.5 text-[10px] text-muted-foreground leading-normal">
+                  <ShieldCheck className="h-4 w-4 text-purple-500 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold block text-foreground">30-Day Money-Back Guarantee</span>
+                    If you are not 100% satisfied, returns are completely free.
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Refund Policy Modal */}
       <Dialog open={activeModal === "refund"} onOpenChange={(open) => !open && setActiveModal(null)}>
