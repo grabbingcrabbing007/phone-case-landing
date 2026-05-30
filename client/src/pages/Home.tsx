@@ -29,7 +29,8 @@ import {
   Mail,
   Phone,
   MapPin,
-  MessageSquare
+  MessageSquare,
+  ShoppingCart
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -50,6 +51,7 @@ export default function Home() {
   const [cookieAccepted, setCookieNotice] = useState<boolean>(true);
   const [selectedColor, setSelectedColor] = useState<string>("pink");
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [showFloatingBtn, setShowFloatingBtn] = useState<boolean>(false);
   
   // Modal states for policies and contact
   const [activeModal, setActiveModal] = useState<string | null>(null);
@@ -63,12 +65,24 @@ export default function Home() {
   // Newsletter signup state
   const [newsletterEmail, setNewsletterEmail] = useState("");
 
-  // Load cookie preference
+  // Load cookie preference and scroll listener
   useEffect(() => {
     const accepted = localStorage.getItem("cookie_accepted");
     if (!accepted) {
       setCookieNotice(false);
     }
+
+    const handleScroll = () => {
+      // Show floating button after scrolling 400px down
+      if (window.scrollY > 400) {
+        setShowFloatingBtn(true);
+      } else {
+        setShowFloatingBtn(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const acceptCookies = () => {
@@ -656,6 +670,18 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Floating Buy Now Button */}
+      {showFloatingBtn && (
+        <div className="fixed bottom-6 right-6 z-40 animate-in slide-in-from-bottom-10 duration-300">
+          <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-extrabold px-6 py-6 rounded-full shadow-2xl shadow-primary/40 flex items-center gap-2 border border-white/20 hover:scale-105 active:scale-95 transition-all">
+            <a href={PURCHASE_LINK} target="_blank" rel="noopener noreferrer">
+              <ShoppingCart className="h-5 w-5" />
+              <span>Buy Now - 50% OFF</span>
+            </a>
+          </Button>
+        </div>
+      )}
 
       {/* Cookie Consent Notice */}
       {!cookieAccepted && (
