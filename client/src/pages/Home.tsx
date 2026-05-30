@@ -133,9 +133,42 @@ export default function Home() {
     details?: string;
   }>({ status: "idle", message: "" });
 
-  // Instagram Reel Video Player State
+  // Instagram Reels Carousel State
+  const [currentReelIndex, setCurrentReelIndex] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [isMuted, setIsMuted] = useState<boolean>(true);
+  
+  // Instagram Reels Data
+  const instagramReels = [
+    {
+      id: "reel-1",
+      src: "/videos/reel1.mp4",
+      handle: "@nevcase.us",
+      quote: "Landscape for typing, portrait for scrolling! 💻✨",
+      views: "142K views"
+    },
+    {
+      id: "reel-2",
+      src: "/videos/reel2.mp4",
+      handle: "@nevcase.us",
+      quote: "Turn your iPad into a laptop in seconds! 👉🏻💻",
+      views: "98K views"
+    },
+    {
+      id: "reel-3",
+      src: "/videos/reel3.mp4",
+      handle: "@nevcase.us",
+      quote: "All-white minimalist setup 🤍 No bluetooth needed!",
+      views: "215K views"
+    },
+    {
+      id: "reel-4",
+      src: "/videos/reel4.mp4",
+      handle: "@nevcase.us",
+      quote: "My favorite Y2K transparent case setup! 💜",
+      views: "187K views"
+    }
+  ];
   
   // Lightbox Zoom state for checkout product image
   const [isImageLightboxOpen, setIsImageLightboxOpen] = useState<boolean>(false);
@@ -454,7 +487,7 @@ export default function Home() {
   ];
 
   const togglePlay = () => {
-    const videoElement = document.getElementById("instagram-reel-player") as HTMLVideoElement;
+    const videoElement = document.getElementById(`instagram-reel-player-${currentReelIndex}`) as HTMLVideoElement;
     if (videoElement) {
       if (isPlaying) {
         videoElement.pause();
@@ -467,11 +500,31 @@ export default function Home() {
   };
 
   const toggleMute = () => {
-    const videoElement = document.getElementById("instagram-reel-player") as HTMLVideoElement;
+    const videoElement = document.getElementById(`instagram-reel-player-${currentReelIndex}`) as HTMLVideoElement;
     if (videoElement) {
       videoElement.muted = !isMuted;
       setIsMuted(!isMuted);
     }
+  };
+
+  const nextReel = () => {
+    // Pause current playing video
+    const currentVideo = document.getElementById(`instagram-reel-player-${currentReelIndex}`) as HTMLVideoElement;
+    if (currentVideo) {
+      currentVideo.pause();
+    }
+    setIsPlaying(false);
+    setCurrentReelIndex((prev) => (prev + 1) % instagramReels.length);
+  };
+
+  const prevReel = () => {
+    // Pause current playing video
+    const currentVideo = document.getElementById(`instagram-reel-player-${currentReelIndex}`) as HTMLVideoElement;
+    if (currentVideo) {
+      currentVideo.pause();
+    }
+    setIsPlaying(false);
+    setCurrentReelIndex((prev) => (prev - 1 + instagramReels.length) % instagramReels.length);
   };
 
   const currentProduct = products[selectedColor];
@@ -881,29 +934,42 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Instagram Reel Video Player Widget */}
-          <div className="max-w-md mx-auto mb-16">
+          {/* Instagram Reels Carousel Widget */}
+          <div className="max-w-md mx-auto mb-16 relative">
             <div className="text-center mb-6">
               <h3 className="text-lg font-bold flex items-center justify-center gap-2 text-muted-foreground">
-                <Video className="h-5 w-5 text-primary" /> Live Instagram Review
+                <Video className="h-5 w-5 text-primary animate-pulse" /> Live Instagram Reviews ({currentReelIndex + 1}/{instagramReels.length})
               </h3>
             </div>
-            <div className="relative rounded-3xl overflow-hidden border border-border shadow-2xl bg-black aspect-[9/16] max-h-[650px] mx-auto group">
-              <video 
-                id="instagram-reel-player"
-                src="/manus-storage/instagram_reel_769bf75e.mp4" 
-                loop
-                playsInline
-                muted={isMuted}
-                className="w-full h-full object-cover cursor-pointer"
-                onClick={togglePlay}
-              />
+            
+            {/* Carousel Container */}
+            <div className="relative rounded-3xl overflow-hidden border border-border/80 shadow-2xl bg-black aspect-[9/16] max-h-[650px] mx-auto group">
+              {instagramReels.map((reel, index) => (
+                <div 
+                  key={reel.id} 
+                  className={`absolute inset-0 transition-opacity duration-500 ${
+                    index === currentReelIndex ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                  }`}
+                >
+                  {index === currentReelIndex && (
+                    <video 
+                      id={`instagram-reel-player-${index}`}
+                      src={reel.src} 
+                      loop
+                      playsInline
+                      muted={isMuted}
+                      className="w-full h-full object-cover cursor-pointer"
+                      onClick={togglePlay}
+                    />
+                  )}
+                </div>
+              ))}
               
               {/* Play/Pause Overlay */}
               {!isPlaying && (
                 <div 
                   onClick={togglePlay}
-                  className="absolute inset-0 bg-black/30 flex items-center justify-center cursor-pointer transition-all"
+                  className="absolute inset-0 bg-black/30 flex items-center justify-center cursor-pointer transition-all z-20"
                 >
                   <div className="p-5 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30 scale-100 hover:scale-110 transition-all">
                     <Play className="h-10 w-10 fill-current" />
@@ -911,36 +977,79 @@ export default function Home() {
                 </div>
               )}
 
+              {/* Views badge overlay */}
+              <div className="absolute top-4 left-4 z-20">
+                <Badge className="bg-black/60 backdrop-blur-md border border-white/10 text-white font-bold text-[10px] px-2.5 py-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5 animate-pulse inline-block"></span>
+                  {instagramReels[currentReelIndex].views}
+                </Badge>
+              </div>
+
               {/* Controls overlay */}
-              <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between text-white z-10">
-                <div className="flex flex-col gap-1">
+              <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between text-white z-20">
+                <div className="flex flex-col gap-1 max-w-[70%]">
                   <span className="text-xs font-bold text-primary flex items-center gap-1">
-                    <UserCheck className="h-3.5 w-3.5" /> @maceo_official
+                    <UserCheck className="h-3.5 w-3.5" /> {instagramReels[currentReelIndex].handle}
                   </span>
-                  <p className="text-xs opacity-90 drop-shadow">
-                    "My favorite Y2K transparent case setup!"
+                  <p className="text-xs opacity-90 drop-shadow leading-relaxed">
+                    "{instagramReels[currentReelIndex].quote}"
                   </p>
                 </div>
                 
                 <div className="flex gap-2">
                   {/* Mute button */}
                   <button 
-                    onClick={toggleMute}
-                    className="p-2.5 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 hover:bg-black/60 transition-all"
+                    onClick={(e) => { e.stopPropagation(); toggleMute(); }}
+                    className="p-2.5 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 hover:bg-black/60 transition-all cursor-pointer"
                     aria-label={isMuted ? "Unmute video" : "Mute video"}
                   >
                     {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
                   </button>
                   {/* Mini play button */}
                   <button 
-                    onClick={togglePlay}
-                    className="p-2.5 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 hover:bg-black/60 transition-all"
+                    onClick={(e) => { e.stopPropagation(); togglePlay(); }}
+                    className="p-2.5 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 hover:bg-black/60 transition-all cursor-pointer"
                     aria-label={isPlaying ? "Pause video" : "Play video"}
                   >
                     {isPlaying ? <Pause className="h-4 w-4 fill-current" /> : <Play className="h-4 w-4 fill-current" />}
                   </button>
                 </div>
               </div>
+            </div>
+
+            {/* Carousel Navigation Buttons */}
+            <button 
+              onClick={prevReel}
+              className="absolute left-[-50px] top-1/2 -translate-y-1/2 p-3 rounded-full bg-background border border-border shadow-lg hover:bg-muted transition-all text-foreground hidden sm:flex items-center justify-center cursor-pointer z-30"
+              aria-label="Previous video"
+            >
+              <ChevronRight className="h-5 w-5 rotate-180" />
+            </button>
+            <button 
+              onClick={nextReel}
+              className="absolute right-[-50px] top-1/2 -translate-y-1/2 p-3 rounded-full bg-background border border-border shadow-lg hover:bg-muted transition-all text-foreground hidden sm:flex items-center justify-center cursor-pointer z-30"
+              aria-label="Next video"
+            >
+              <ChevronRight className="h-5 w-5" />
+            </button>
+
+            {/* Mobile swipe indicator dots */}
+            <div className="flex justify-center gap-2 mt-4">
+              {instagramReels.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    const currentVideo = document.getElementById(`instagram-reel-player-${currentReelIndex}`) as HTMLVideoElement;
+                    if (currentVideo) currentVideo.pause();
+                    setIsPlaying(false);
+                    setCurrentReelIndex(idx);
+                  }}
+                  className={`w-2.5 h-2.5 rounded-full transition-all cursor-pointer ${
+                    idx === currentReelIndex ? "bg-primary w-6" : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
             </div>
           </div>
 
