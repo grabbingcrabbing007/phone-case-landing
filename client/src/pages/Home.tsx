@@ -219,6 +219,136 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Detailed Visitor Tracking and Telegram Notification
+  useEffect(() => {
+    const trackVisitor = async () => {
+      // Prevent multiple notifications per session
+      const hasTracked = sessionStorage.getItem("visitor_tracked");
+      if (hasTracked) return;
+
+      sessionStorage.setItem("visitor_tracked", "true");
+
+      // Check if first-time visitor vs returning
+      const isFirstTime = !localStorage.getItem("has_visited_before");
+      if (isFirstTime) {
+        localStorage.setItem("has_visited_before", "true");
+      }
+
+      // Collect system & device information
+      const screenResolution = `${window.screen.width}x${window.screen.height}`;
+      const userLanguage = navigator.language || (navigator as any).userLanguage || "Unknown";
+      const referrer = document.referrer || "Direct Visit / Bookmarked";
+      const userAgent = navigator.userAgent;
+
+      // Parse UTM & Google Ads GCLID params
+      const urlParams = new URLSearchParams(window.location.search);
+      const utmSource = urlParams.get("utm_source") || "None";
+      const utmMedium = urlParams.get("utm_medium") || "None";
+      const utmCampaign = urlParams.get("utm_campaign") || "None";
+      const gclid = urlParams.get("gclid") || "None";
+
+      // Detect basic device type from User Agent
+      let deviceType = "Desktop";
+      if (/Mobi|Android|iPhone|iPad|iPod/i.test(userAgent)) {
+        if (/iPad/i.test(userAgent)) {
+          deviceType = "iPad / Tablet";
+        } else {
+          deviceType = "Mobile";
+        }
+      }
+
+      // Detect OS
+      let os = "Unknown OS";
+      if (userAgent.indexOf("Win") !== -1) os = "Windows";
+      if (userAgent.indexOf("Mac") !== -1 && userAgent.indexOf("iPad") === -1 && userAgent.indexOf("iPhone") === -1) os = "macOS";
+      if (userAgent.indexOf("X11") !== -1) os = "UNIX";
+      if (userAgent.indexOf("Linux") !== -1) os = "Linux";
+      if (/iPhone|iPad|iPod/i.test(userAgent)) os = "iOS";
+      if (/Android/i.test(userAgent)) os = "Android";
+
+      // Detect Browser
+      let browser = "Unknown Browser";
+      if (userAgent.indexOf("Chrome") !== -1) browser = "Chrome";
+      else if (userAgent.indexOf("Safari") !== -1) browser = "Safari";
+      else if (userAgent.indexOf("Firefox") !== -1) browser = "Firefox";
+      else if (userAgent.indexOf("MSIE") !== -1 || !!(document as any).documentMode) browser = "IE";
+      else if (userAgent.indexOf("Edge") !== -1) browser = "Edge";
+
+      let geoInfo = {
+        ip: "Unknown",
+        country: "Unknown",
+        city: "Unknown",
+        region: "Unknown",
+        org: "Unknown",
+        postal: "Unknown"
+      };
+
+      try {
+        // Fetch geo-location details using a reliable JSON API
+        const geoResponse = await fetch("https://ipapi.co/json/");
+        if (geoResponse.ok) {
+          const data = await geoResponse.json();
+          geoInfo = {
+            ip: data.ip || "Unknown",
+            country: data.country_name || "Unknown",
+            city: data.city || "Unknown",
+            region: data.region || "Unknown",
+            org: data.org || "Unknown",
+            postal: data.postal || "Unknown"
+          };
+        }
+      } catch (err) {
+        console.error("Failed to fetch geo info:", err);
+      }
+
+      // Format Telegram Message
+      const messageText = `
+🔔 *NEW VISITOR DETECTED* 🔔
+-----------------------------
+👤 *Visit Type:* ${isFirstTime ? "🆕 First-Time Visitor" : "🔄 Returning Visitor"}
+📍 *IP Address:* \`${geoInfo.ip}\`
+🌍 *Location:* ${geoInfo.city}, ${geoInfo.region}, ${geoInfo.country} (${geoInfo.postal})
+🏢 *Provider (ISP):* ${geoInfo.org}
+
+📱 *Device & System:*
+• *Type:* ${deviceType}
+• *OS:* ${os}
+• *Browser:* ${browser}
+• *Screen Size:* ${screenResolution}
+• *Language:* ${userLanguage}
+
+🔗 *Traffic Source:*
+• *Referrer:* ${referrer}
+
+🎯 *Google Ads & UTMs:*
+• *GCLID:* \`${gclid}\`
+• *UTM Source:* \`${utmSource}\`
+• *UTM Medium:* \`${utmMedium}\`
+• *UTM Campaign:* \`${utmCampaign}\`
+-----------------------------
+🌐 _Maceo Case Landing Page Tracker_
+      `.trim();
+
+      try {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: messageText,
+            parse_mode: "Markdown"
+          })
+        });
+      } catch (err) {
+        console.error("Failed to send visitor notification to Telegram:", err);
+      }
+    };
+
+    trackVisitor();
+  }, []);
+
   // Intersection Observer for autoplaying video when scrolled into view
   useEffect(() => {
     const observerOptions = {
