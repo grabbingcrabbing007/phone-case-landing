@@ -36,8 +36,11 @@ import {
   ShoppingCart,
   AlertCircle,
   UserCheck,
-  ChevronLeft,
-  Camera
+  Video,
+  Play,
+  Pause,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -74,13 +77,6 @@ interface Review {
   colorPurchased: string;
 }
 
-interface CustomerPhoto {
-  id: string;
-  url: string;
-  caption: string;
-  author: string;
-}
-
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
   const [cookieAccepted, setCookieNotice] = useState<boolean>(true);
@@ -108,8 +104,9 @@ export default function Home() {
     details?: string;
   }>({ status: "idle", message: "" });
 
-  // Customer Photo Slider State
-  const [currentPhotoIdx, setCurrentPhotoIdx] = useState<number>(0);
+  // Instagram Reel Video Player State
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isMuted, setIsMuted] = useState<boolean>(true);
 
   // Load cookie preference and scroll listener
   useEffect(() => {
@@ -287,33 +284,6 @@ export default function Home() {
     }
   };
 
-  const customerPhotos: CustomerPhoto[] = [
-    {
-      id: "photo-1",
-      url: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800",
-      caption: "Retro vibe setup in my favorite coffee shop! Love the transparent aesthetic.",
-      author: "@retro_tech_aesthetic"
-    },
-    {
-      id: "photo-2",
-      url: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800",
-      caption: "The 360 degree rotating keyboard makes drawing so much easier. Absolute lifesaver.",
-      author: "@illustrate_with_emily"
-    },
-    {
-      id: "photo-3",
-      url: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=800",
-      caption: "Fits perfectly on my minimal desk. Backlit keys match my neon room glow!",
-      author: "@desk_setups_daily"
-    },
-    {
-      id: "photo-4",
-      url: "https://images.unsplash.com/photo-1512486130939-2c4f79935e4f?w=800",
-      caption: "Work from anywhere mode unlocked. Battery life on this case is insane.",
-      author: "@digital_nomad_sarah"
-    }
-  ];
-
   const reviews: Review[] = [
     {
       id: "rev-1",
@@ -361,12 +331,25 @@ export default function Home() {
     }
   ];
 
-  const nextPhoto = () => {
-    setCurrentPhotoIdx((prev) => (prev + 1) % customerPhotos.length);
+  const togglePlay = () => {
+    const videoElement = document.getElementById("instagram-reel-player") as HTMLVideoElement;
+    if (videoElement) {
+      if (isPlaying) {
+        videoElement.pause();
+        setIsPlaying(false);
+      } else {
+        videoElement.play().catch(console.error);
+        setIsPlaying(true);
+      }
+    }
   };
 
-  const prevPhoto = () => {
-    setCurrentPhotoIdx((prev) => (prev - 1 + customerPhotos.length) % customerPhotos.length);
+  const toggleMute = () => {
+    const videoElement = document.getElementById("instagram-reel-player") as HTMLVideoElement;
+    if (videoElement) {
+      videoElement.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
   };
 
   const currentProduct = products[selectedColor];
@@ -770,12 +753,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Customer Reviews & Photo Gallery Section */}
+      {/* Customer Reviews & Video Showcase Section */}
       <section id="reviews" className="py-20 bg-muted/20 border-b border-border/30">
         <div className="container">
           <div className="text-center max-w-2xl mx-auto mb-16 flex flex-col gap-4">
             <Badge className="w-fit mx-auto px-3 py-1 text-xs font-semibold bg-primary/10 text-primary border-none">
-              REAL REVIEWS & PHOTOS
+              REAL CUSTOMER VIDEO
             </Badge>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
               Loved by 50,000+ iPad Users
@@ -790,55 +773,65 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Interactive Customer Photo Gallery Slider */}
-          <div className="max-w-4xl mx-auto mb-16">
+          {/* Instagram Reel Video Player Widget */}
+          <div className="max-w-md mx-auto mb-16">
             <div className="text-center mb-6">
               <h3 className="text-lg font-bold flex items-center justify-center gap-2 text-muted-foreground">
-                <Camera className="h-5 w-5 text-primary" /> Photos Shared by Customers
+                <Video className="h-5 w-5 text-primary" /> Live Instagram Review
               </h3>
             </div>
-            <div className="relative rounded-2xl overflow-hidden border border-border shadow-xl bg-card aspect-[16/10] sm:aspect-[16/9]">
-              <img 
-                src={customerPhotos[currentPhotoIdx].url} 
-                alt={customerPhotos[currentPhotoIdx].caption}
-                className="w-full h-full object-cover transition-all duration-500"
+            <div className="relative rounded-3xl overflow-hidden border border-border shadow-2xl bg-black aspect-[9/16] max-h-[650px] mx-auto group">
+              <video 
+                id="instagram-reel-player"
+                src="/manus-storage/instagram_reel_769bf75e.mp4" 
+                loop
+                playsInline
+                muted={isMuted}
+                className="w-full h-full object-cover cursor-pointer"
+                onClick={togglePlay}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6 text-white">
-                <p className="text-sm sm:text-base font-medium leading-relaxed max-w-2xl mb-2">
-                  "{customerPhotos[currentPhotoIdx].caption}"
-                </p>
-                <span className="text-xs text-primary font-bold">
-                  {customerPhotos[currentPhotoIdx].author}
-                </span>
-              </div>
               
-              {/* Slider Navigation Buttons */}
-              <button 
-                onClick={prevPhoto}
-                className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 hover:bg-black/80 text-white transition-all"
-                aria-label="Previous photo"
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </button>
-              <button 
-                onClick={nextPhoto}
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 hover:bg-black/80 text-white transition-all"
-                aria-label="Next photo"
-              >
-                <ChevronRight className="h-6 w-6" />
-              </button>
+              {/* Play/Pause Overlay */}
+              {!isPlaying && (
+                <div 
+                  onClick={togglePlay}
+                  className="absolute inset-0 bg-black/30 flex items-center justify-center cursor-pointer transition-all"
+                >
+                  <div className="p-5 rounded-full bg-white/20 backdrop-blur-md text-white border border-white/30 scale-100 hover:scale-110 transition-all">
+                    <Play className="h-10 w-10 fill-current" />
+                  </div>
+                </div>
+              )}
 
-              {/* Photo Dots Indicator */}
-              <div className="absolute top-4 right-4 flex gap-1.5 bg-black/40 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                {customerPhotos.map((_, idx) => (
+              {/* Controls overlay */}
+              <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between text-white z-10">
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-bold text-primary flex items-center gap-1">
+                    <UserCheck className="h-3.5 w-3.5" /> @maceo_official
+                  </span>
+                  <p className="text-xs opacity-90 drop-shadow">
+                    "My favorite Y2K transparent case setup!"
+                  </p>
+                </div>
+                
+                <div className="flex gap-2">
+                  {/* Mute button */}
                   <button 
-                    key={idx}
-                    onClick={() => setCurrentPhotoIdx(idx)}
-                    className={`h-2 w-2 rounded-full transition-all ${
-                      currentPhotoIdx === idx ? "bg-primary w-4" : "bg-white/50"
-                    }`}
-                  />
-                ))}
+                    onClick={toggleMute}
+                    className="p-2.5 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 hover:bg-black/60 transition-all"
+                    aria-label={isMuted ? "Unmute video" : "Mute video"}
+                  >
+                    {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                  </button>
+                  {/* Mini play button */}
+                  <button 
+                    onClick={togglePlay}
+                    className="p-2.5 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 hover:bg-black/60 transition-all"
+                    aria-label={isPlaying ? "Pause video" : "Play video"}
+                  >
+                    {isPlaying ? <Pause className="h-4 w-4 fill-current" /> : <Play className="h-4 w-4 fill-current" />}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
