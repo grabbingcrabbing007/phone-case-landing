@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { 
   Check, 
@@ -31,7 +32,8 @@ import {
   Phone,
   MapPin,
   MessageSquare,
-  ShoppingCart
+  ShoppingCart,
+  AlertCircle
 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -47,6 +49,13 @@ interface Product {
   features: string[];
   colorName: string;
   colorClass: string;
+}
+
+interface iPadModel {
+  id: string;
+  name: string;
+  numbers: string[];
+  compatible: boolean;
 }
 
 export default function Home() {
@@ -67,6 +76,14 @@ export default function Home() {
 
   // Newsletter signup state
   const [newsletterEmail, setNewsletterEmail] = useState("");
+
+  // Compatibility Checker State
+  const [selectedModel, setSelectedModel] = useState<string>("");
+  const [compatibilityResult, setCompatibilityResult] = useState<{
+    status: "idle" | "success" | "fail";
+    message: string;
+    details?: string;
+  }>({ status: "idle", message: "" });
 
   // Load cookie preference and scroll listener
   useEffect(() => {
@@ -118,6 +135,42 @@ export default function Home() {
     }
     toast.success("Thank you for subscribing! Check your inbox for your 10% discount code.");
     setNewsletterEmail("");
+  };
+
+  // iPad compatibility database
+  const ipadModels: iPadModel[] = [
+    { id: "pro-11-m4", name: "iPad Pro 11-inch (M4, 2024)", numbers: ["A2836", "A2837", "A3006"], compatible: true },
+    { id: "pro-11-4", name: "iPad Pro 11-inch (4th Gen, 2022)", numbers: ["A2759", "A2435", "A2761", "A2762"], compatible: true },
+    { id: "pro-11-3", name: "iPad Pro 11-inch (3rd Gen, 2021)", numbers: ["A2377", "A2459", "A2301", "A2460"], compatible: true },
+    { id: "pro-11-2", name: "iPad Pro 11-inch (2nd Gen, 2020)", numbers: ["A2228", "A2068", "A2230", "A2231"], compatible: true },
+    { id: "pro-11-1", name: "iPad Pro 11-inch (1st Gen, 2018)", numbers: ["A1980", "A2013", "A1934", "A1979"], compatible: true },
+    { id: "air-11-m2", name: "iPad Air 11-inch (M2, 2024)", numbers: ["A2902", "A2903", "A2904"], compatible: true },
+    { id: "air-5", name: "iPad Air (5th Gen, 2022)", numbers: ["A2588", "A2589", "A2591"], compatible: true },
+    { id: "air-4", name: "iPad Air (4th Gen, 2020)", numbers: ["A2316", "A2324", "A2325", "A2072"], compatible: true },
+    { id: "ipad-10", name: "iPad 10.9-inch (10th Gen, 2022)", numbers: ["A2696", "A2757", "A2777"], compatible: true },
+    { id: "ipad-9", name: "iPad 10.2-inch (9th Gen, 2021)", numbers: ["A2602", "A2603", "A2604", "A2605"], compatible: false },
+    { id: "ipad-8", name: "iPad 10.2-inch (8th Gen, 2020)", numbers: ["A2270", "A2428", "A2429", "A2430"], compatible: false },
+    { id: "mini-6", name: "iPad mini (6th Gen, 2021)", numbers: ["A2567", "A2568", "A2569"], compatible: false }
+  ];
+
+  const handleModelChange = (value: string) => {
+    setSelectedModel(value);
+    const model = ipadModels.find((m) => m.id === value);
+    if (model) {
+      if (model.compatible) {
+        setCompatibilityResult({
+          status: "success",
+          message: "🎉 Perfect Match!",
+          details: `Your model (${model.name}) is 100% compatible with Maceo 360° cases. Model numbers: ${model.numbers.join(", ")}.`
+        });
+      } else {
+        setCompatibilityResult({
+          status: "fail",
+          message: "⚠️ Not Compatible",
+          details: `Unfortunately, ${model.name} is not compatible with our 11-inch 360° Rotating series. We currently only support iPad Pro 11", iPad Air 10.9"/11", and iPad 10th Gen.`
+        });
+      }
+    }
   };
 
   const products: Record<string, Product> = {
@@ -476,6 +529,48 @@ export default function Home() {
                 <h2 className="text-3xl font-bold font-display tracking-tight leading-tight">
                   {currentProduct.name}
                 </h2>
+              </div>
+
+              {/* Interactive Compatibility Checker Widget */}
+              <div className="p-5 rounded-2xl border border-border/80 bg-card flex flex-col gap-4">
+                <div className="flex items-center gap-2">
+                  <Smartphone className="h-5 w-5 text-primary" />
+                  <span className="text-sm font-bold tracking-tight">Check iPad Compatibility</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Select your iPad model below to confirm compatibility instantly before purchasing.
+                </p>
+                
+                <Select value={selectedModel} onValueChange={handleModelChange}>
+                  <SelectTrigger className="w-full rounded-xl bg-background border-border/80">
+                    <SelectValue placeholder="Select your iPad model..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ipadModels.map((model) => (
+                      <SelectItem key={model.id} value={model.id}>
+                        {model.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {compatibilityResult.status !== "idle" && (
+                  <div className={`p-4 rounded-xl border text-xs flex gap-3 animate-in fade-in duration-200 ${
+                    compatibilityResult.status === "success" 
+                      ? "bg-green-500/5 border-green-500/20 text-green-700 dark:text-green-300" 
+                      : "bg-red-500/5 border-red-500/20 text-red-700 dark:text-red-300"
+                  }`}>
+                    {compatibilityResult.status === "success" ? (
+                      <Check className="h-5 w-5 text-green-500 shrink-0" />
+                    ) : (
+                      <AlertCircle className="h-5 w-5 text-red-500 shrink-0" />
+                    )}
+                    <div className="flex flex-col gap-1">
+                      <span className="font-bold">{compatibilityResult.message}</span>
+                      <p className="leading-relaxed opacity-90">{compatibilityResult.details}</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Pricing Box */}
