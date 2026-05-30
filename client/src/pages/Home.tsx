@@ -1387,7 +1387,12 @@ export default function Home() {
                         {checkoutProduct.colorName}
                       </Badge>
                       <Badge variant="outline" className="text-[10px] font-bold px-2.5 py-1 border-border/80">
-                        11" Case
+                        {checkoutModel === "pro-11-m4" || checkoutModel === "pro-11-4" || checkoutModel === "pro-11-3" || checkoutModel === "pro-11-2" || checkoutModel === "pro-11-1" || checkoutModel === "air-11-m2"
+                          ? '11" Case'
+                          : checkoutModel === "air-5" || checkoutModel === "air-4" || checkoutModel === "ipad-10"
+                            ? '10.9" Case'
+                            : '11" Case'
+                        }
                       </Badge>
                     </div>
                   </div>
