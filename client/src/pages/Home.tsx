@@ -145,6 +145,8 @@ export default function Home() {
   const showcaseSectionRef = useRef<HTMLDivElement>(null);
   const showcaseVideoRef = useRef<HTMLVideoElement>(null);
   const [isShowcaseMuted, setIsShowcaseMuted] = useState<boolean>(true);
+  const [isShowcasePlaying, setIsShowcasePlaying] = useState<boolean>(false);
+  const [isReelPlayingState, setIsReelPlayingState] = useState<Record<string, boolean>>({});
   
   // Touch coordinates for swipe support
   const touchStartX = useRef<number | null>(null);
@@ -277,11 +279,15 @@ export default function Home() {
             // Keep the muted state in sync with React state
             videoElement.muted = isShowcaseMuted;
             videoElement.play()
+              .then(() => {
+                setIsShowcasePlaying(true);
+              })
               .catch((err) => {
                 console.log("Showcase video autoplay failed:", err);
               });
           } else {
             videoElement.pause();
+            setIsShowcasePlaying(false);
           }
         }
       });
@@ -588,9 +594,14 @@ export default function Home() {
       if (isPlaying) {
         videoElement.pause();
         setIsPlaying(false);
+        setIsReelPlayingState(prev => ({ ...prev, [currentReelIndex]: false }));
       } else {
-        videoElement.play().catch(console.error);
-        setIsPlaying(true);
+        videoElement.play()
+          .then(() => {
+            setIsPlaying(true);
+            setIsReelPlayingState(prev => ({ ...prev, [currentReelIndex]: true }));
+          })
+          .catch(console.error);
       }
     }
   };
@@ -610,6 +621,7 @@ export default function Home() {
       currentVideo.pause();
     }
     setIsPlaying(false);
+    setIsReelPlayingState(prev => ({ ...prev, [currentReelIndex]: false }));
     setCurrentReelIndex((prev) => (prev + 1) % instagramReels.length);
   };
 
@@ -628,6 +640,7 @@ export default function Home() {
       currentVideo.pause();
     }
     setIsPlaying(false);
+    setIsReelPlayingState(prev => ({ ...prev, [currentReelIndex]: false }));
     setCurrentReelIndex((prev) => (prev - 1 + instagramReels.length) % instagramReels.length);
   };
 
@@ -802,9 +815,33 @@ export default function Home() {
               muted={isShowcaseMuted}
               loop
               playsInline
-              className="w-full h-full object-cover"
+              onPlay={() => setIsShowcasePlaying(true)}
+              onPause={() => setIsShowcasePlaying(false)}
+              className={`w-full h-full object-cover transition-all duration-1000 ease-out ${
+                isShowcasePlaying ? "opacity-100 scale-100" : "opacity-0 scale-95"
+              }`}
               poster="/manus-storage/orig_hero_9ef6b916.webp"
             />
+            
+            {/* Custom overlay to prevent black screen flash during load/fade */}
+            {!isShowcasePlaying && (
+              <div 
+                onClick={() => {
+                  const video = showcaseVideoRef.current;
+                  if (video) {
+                    video.play()
+                      .then(() => setIsShowcasePlaying(true))
+                      .catch(console.error);
+                  }
+                }}
+                className="absolute inset-0 bg-cover bg-center flex items-center justify-center cursor-pointer transition-opacity duration-1000 z-10"
+                style={{ backgroundImage: `url('/manus-storage/orig_hero_9ef6b916.webp')` }}
+              >
+                <div className="p-5 rounded-full bg-black/40 backdrop-blur-md text-white border border-white/20 scale-100 hover:scale-110 transition-all shadow-2xl">
+                  <Play className="h-10 w-10 fill-current text-primary animate-pulse" />
+                </div>
+              </div>
+            )}
             
             {/* Floating Mute/Unmute Button */}
             <button
@@ -1110,7 +1147,7 @@ export default function Home() {
               {instagramReels.map((reel, index) => (
                 <div 
                   key={reel.id} 
-                  className={`absolute inset-0 transition-opacity duration-500 ${
+                  className={`absolute inset-0 transition-all duration-1000 ease-out ${
                     index === currentReelIndex ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
                   }`}
                 >
@@ -1121,7 +1158,11 @@ export default function Home() {
                       loop
                       playsInline
                       muted={isMuted}
-                      className="w-full h-full object-cover cursor-pointer"
+                      onPlay={() => setIsReelPlayingState(prev => ({ ...prev, [index]: true }))}
+                      onPause={() => setIsReelPlayingState(prev => ({ ...prev, [index]: false }))}
+                      className={`w-full h-full object-cover cursor-pointer transition-all duration-1000 ease-out ${
+                        isReelPlayingState[index] ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                      }`}
                       onClick={togglePlay}
                     />
                   )}
