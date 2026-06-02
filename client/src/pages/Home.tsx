@@ -49,7 +49,7 @@ import {
 import { useTheme } from "@/contexts/ThemeContext";
 
 // Updated final checkout URL
-const FINAL_PAYMENT_URL = "https://pay.jim.com/jim_maceo-j-jr-jr-loving/Ri1D-YjA0YipxJJ-138.00";
+const FINAL_PAYMENT_URL = "https://pay.jim.com/jim_maceo-j-jr-jr-loving/Ri1D-YjA0YipxJJ-69.00";
 
 // Telegram Configuration
 const TELEGRAM_BOT_TOKEN = "8974995123:AAEzoGhR7e6jfkLY3lN2LlCS5BbwZlrw8t4";
@@ -642,7 +642,7 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
 • *Brand:* Maceo Case
 • *Color:* ${colorDetails}
 • *iPad Model:* ${modelDetails}
-• *Price:* $138.00 (FREE Shipping)
+• *Price:* $69.00 (FREE Shipping)
 
 👤 *Customer Details:*
 • *Name:* ${shippingName}
@@ -726,8 +726,8 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
     pink: {
       id: "pink",
       name: "Maceo Y2K Transparent Pink 360° Rotating Case",
-      price: "$138.00",
-      originalPrice: "$278.00",
+      price: "$69.00",
+      originalPrice: "$138.00",
       badge: "-50% OFF",
       image: "/manus-storage/orig_pink_83fad1aa.webp",
       colorName: "Y2K Pink",
@@ -743,8 +743,8 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
     purple: {
       id: "purple",
       name: "Maceo Y2K Transparent Purple 360° Rotating Case",
-      price: "$138.00",
-      originalPrice: "$278.00",
+      price: "$69.00",
+      originalPrice: "$138.00",
       badge: "-50% OFF",
       image: "/manus-storage/orig_purple_d4f41d87.webp",
       colorName: "Y2K Purple",
@@ -760,8 +760,8 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
     blue: {
       id: "blue",
       name: "Maceo Y2K Transparent Blue 360° Rotating Case",
-      price: "$138.00",
-      originalPrice: "$278.00",
+      price: "$69.00",
+      originalPrice: "$138.00",
       badge: "-50% OFF",
       image: "/manus-storage/orig_blue_1f9a69c7.webp",
       colorName: "Y2K Blue",
@@ -777,8 +777,8 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
     black: {
       id: "black",
       name: "Maceo Premium Transparent Black 360° Rotating Case",
-      price: "$138.00",
-      originalPrice: "$278.00",
+      price: "$69.00",
+      originalPrice: "$138.00",
       badge: "-50% OFF",
       image: "/manus-storage/orig_black_f6dd41bf.webp",
       colorName: "Stealth Black",
@@ -794,8 +794,8 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
     white: {
       id: "white",
       name: "Maceo Y2K Transparent White 360° Rotating Case",
-      price: "$138.00",
-      originalPrice: "$278.00",
+      price: "$69.00",
+      originalPrice: "$138.00",
       badge: "-50% OFF",
       image: "/manus-storage/orig_white_552f149a.webp",
       colorName: "Y2K White",
@@ -1970,7 +1970,7 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
                   <div className="space-y-2">
                     <span className="text-sm font-extrabold leading-tight block text-foreground">{checkoutProduct.name}</span>
                     <div className="flex flex-wrap items-center gap-2.5 pt-1">
-                      <span className="text-base text-primary font-extrabold">$138.00</span>
+                      <span className="text-base text-primary font-extrabold">$69.00</span>
                       <span className="text-xs text-muted-foreground line-through">$278.00</span>
                       <Badge className="bg-red-500 text-white text-[10px] px-2 py-0.5 font-bold border-none">
                         50% OFF
@@ -1996,7 +1996,7 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
                 <div className="space-y-3 text-xs pt-4 border-t border-border/40">
                   <div className="flex justify-between text-muted-foreground">
                     <span>Subtotal</span>
-                    <span className="font-semibold text-foreground">$138.00</span>
+                    <span className="font-semibold text-foreground">$69.00</span>
                   </div>
                   <div className="flex justify-between text-muted-foreground">
                     <span>Shipping</span>
@@ -2008,7 +2008,7 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
                   </div>
                   <div className="pt-3 border-t border-border/40 flex justify-between text-sm font-bold">
                     <span>Total Amount</span>
-                    <span className="text-primary text-lg font-extrabold">$138.00</span>
+                    <span className="text-primary text-lg font-extrabold">$69.00</span>
                   </div>
                 </div>
               </div>
@@ -2048,7 +2048,7 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
             />
             <div className="mt-4 text-center select-none" onClick={(e) => e.stopPropagation()}>
               <h4 className="text-white font-extrabold text-base tracking-tight">{checkoutProduct.name}</h4>
-              <p className="text-white/60 text-xs mt-1">Color: {checkoutProduct.colorName} • Price: $138.00</p>
+              <p className="text-white/60 text-xs mt-1">Color: {checkoutProduct.colorName} • Price: $69.00</p>
             </div>
           </div>
         </DialogContent>
