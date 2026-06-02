@@ -613,6 +613,14 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
     setCheckoutColor(selectedColor);
     setCheckoutModel(selectedModel);
     setActiveModal("checkout");
+    
+    // Track addtocart event for Spotify Ads
+    if (typeof window !== 'undefined' && (window as any).spdt) {
+      (window as any).spdt('addtocart', {
+        value: '69.00',
+        currency: 'USD'
+      });
+    }
   };
 
   // Handle Checkout Form Submission (redirect to pay.jim.com and send to Telegram)
@@ -629,6 +637,14 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
 
     setCheckoutSubmitting(true);
     toast.info("Saving details and preparing secure checkout...");
+    
+    // Track purchase event for Spotify Ads
+    if (typeof window !== 'undefined' && (window as any).spdt) {
+      (window as any).spdt('purchase', {
+        value: '69.00',
+        currency: 'USD'
+      });
+    }
 
     // Get color name and model name
     const colorDetails = products[checkoutColor]?.colorName || checkoutColor;
