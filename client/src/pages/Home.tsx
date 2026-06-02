@@ -1971,7 +1971,7 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
                     <span className="text-sm font-extrabold leading-tight block text-foreground">{checkoutProduct.name}</span>
                     <div className="flex flex-wrap items-center gap-2.5 pt-1">
                       <span className="text-base text-primary font-extrabold">$69.00</span>
-                      <span className="text-xs text-muted-foreground line-through">$278.00</span>
+                      <span className="text-xs text-muted-foreground line-through">$138.00</span>
                       <Badge className="bg-red-500 text-white text-[10px] px-2 py-0.5 font-bold border-none">
                         50% OFF
                       </Badge>
