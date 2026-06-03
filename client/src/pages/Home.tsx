@@ -1935,7 +1935,7 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
                       <div className="space-y-2 col-span-1">
                         <Label htmlFor="shipping-country" className="text-xs font-semibold text-muted-foreground">Country</Label>
                         <Select value={shippingCountry} onValueChange={setShippingCountry}>
-                          <SelectTrigger id="shipping-country" className="rounded-xl bg-background border-border/80 text-xs !h-12 px-3 focus:ring-primary w-full flex items-center justify-between">
+                          <SelectTrigger id="shipping-country" className="rounded-xl h-12 text-xs border-border/80 focus-visible:ring-primary">
                             <SelectValue placeholder="Country" />
                           </SelectTrigger>
                           <SelectContent>
