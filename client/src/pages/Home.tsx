@@ -621,6 +621,17 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
         currency: 'USD'
       });
     }
+    
+    // Track ViewContent (cardview) event for Facebook Pixel
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'ViewContent', {
+        content_ids: [selectedColor],
+        content_name: products[selectedColor]?.name || 'Maceo iPad Case',
+        content_type: 'product',
+        value: 69.00,
+        currency: 'USD'
+      });
+    }
   };
 
   // Handle Checkout Form Submission (redirect to pay.jim.com and send to Telegram)
@@ -642,6 +653,16 @@ ${isBot ? "🤖 *BOT / CRAWLER DETECTED*" : "👤 *REAL VISITOR DETECTED*"}
     if (typeof window !== 'undefined' && (window as any).spdt) {
       (window as any).spdt('purchase', {
         value: '69.00',
+        currency: 'USD'
+      });
+    }
+    
+    // Track Lead event for Facebook Pixel (payment button click)
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'Lead', {
+        content_name: products[checkoutColor]?.name || 'Maceo iPad Case',
+        content_category: 'iPad Case',
+        value: 69.00,
         currency: 'USD'
       });
     }
