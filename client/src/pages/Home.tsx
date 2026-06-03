@@ -49,7 +49,7 @@ import {
 import { useTheme } from "@/contexts/ThemeContext";
 
 // Updated final checkout URL
-const FINAL_PAYMENT_URL = "https://pay.jim.com/jim_maceo-j-jr-jr-loving/Ri1D-YjA0YipxJJ-69.00";
+const FINAL_PAYMENT_URL = "https://pay.jim.com/jim_maceo-j-jr-jr-loving/Ri0x-chbtQTQXFZ-69.00";
 
 // Telegram Configuration
 const TELEGRAM_BOT_TOKEN = "8974995123:AAEzoGhR7e6jfkLY3lN2LlCS5BbwZlrw8t4";
